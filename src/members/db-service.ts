@@ -5,7 +5,7 @@ import {
 } from 'slonik';
 import { UnknownExtra } from '../interfaces/extra';
 
-import { Member } from '../interfaces/member';
+import {Member} from '../interfaces/member';
 
 declare module 'fastify' {
 	interface FastifyInstance {

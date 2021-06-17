@@ -2,17 +2,11 @@
 import { Actor } from './actor';
 import { UnknownExtra } from './extra';
 
-export enum MemberType {
-  Individual = 'individual',
-  Group = 'group'
-}
-
-
-export interface Member<E extends UnknownExtra = UnknownExtra> extends Actor {
+export interface Member extends Actor {
   name: string;
   email: string;
-  type: MemberType;
-  extra: E;
+  extra: any;
   createdAt: string;
   updatedAt: string;
 }
+
