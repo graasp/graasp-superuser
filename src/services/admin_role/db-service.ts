@@ -3,25 +3,23 @@ import {
 	sql,
 	DatabaseTransactionConnectionType as TrxHandler
 } from 'slonik';
-import { UnknownExtra } from '../interfaces/extra';
+import { UnknownExtra } from '../../interfaces/extra';
 
-import {Member} from '../interfaces/member';
+import {AdminRole} from '../../interfaces/admin-role';
 
 declare module 'fastify' {
 	interface FastifyInstance {
-		members: {
-			dbService: MemberService
+		adminRole: {
+			dbService: AdminRoleService
 		};
 	}
 }
 
-export class MemberService {
+export class AdminRoleService {
 	// the 'safe' way to dynamically generate the columns names:
 	private static allColumns = sql.join(
 		[
-			'id', 'name', 'email', 'type', 'extra',
-			['created_at', 'createdAt'],
-			['updated_at', 'updatedAt'],
+			'id', 'admin', 'role',
 		].map(c =>
 			!Array.isArray(c) ?
 				sql.identifier([c]) :
@@ -30,14 +28,16 @@ export class MemberService {
 		sql`, `
 	);
 
+	async getMemberRole(id: string, dbHandler: TrxHandler): Promise<AdminRole> {
 
-	async getAllMembers(dbHandler: TrxHandler):Promise<Member[]> {
-
+		return dbHandler
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		return dbHandler.query<Member>(sql`
-       	SELECT ${MemberService.allColumns}
-        FROM member`).then(({rows}) => rows.slice(0));
-
+		.query<Role>(sql`
+				SELECT admin_role.*
+				FROM member
+				JOIN admin_role ON admin_role.admin = member.id
+				WHERE member.id = ${id}
+			`).then(({rows}) => rows[0]);
 	}
 }

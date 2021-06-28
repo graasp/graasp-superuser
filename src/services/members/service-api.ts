@@ -1,11 +1,6 @@
 import fastify, { FastifyPluginAsync } from 'fastify';
-import common, { getOne, getBy, updateOne } from './schemas';
-import {
-	sql,
-	DatabaseTransactionConnectionType as TrxHandler
-} from 'slonik';
+import common from './schemas';
 import {MemberRepository} from './repository';
-import { Member } from '../interfaces/member';
 
 const ROUTES_PREFIX = '/members';
 
@@ -17,8 +12,11 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 	fastify.addSchema(common);
 
 	fastify.register(async function (fastify) {
+
+		fastify.addHook('preHandler', fastify.verifyAuthentication );
+
 		fastify.get(
-			'/all' , async (request,reply) => {
+			'/getAll' , async (request,reply) => {
 					const allMembers = await repository.getAllMembers();
 					return allMembers;
 			});
