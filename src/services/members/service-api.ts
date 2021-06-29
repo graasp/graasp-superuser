@@ -1,4 +1,4 @@
-import fastify, { FastifyPluginAsync } from 'fastify';
+import {FastifyPluginAsync} from 'fastify';
 import common, {getOne} from './schemas';
 import {MemberRepository} from './repository';
 import {IdParam} from '../../interfaces/requests';
@@ -20,22 +20,23 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		fastify.addHook('preHandler', fastify.verifyAuthentication );
 
 		fastify.get(
-			GET_ALL.route, async ({ memberRole, log }) => {
-				const route = ROUTES_PREFIX+GET_ALL.route;
-				await permissionRepository.checkPermissions(memberRole.role,route,GET_ALL.request_method);
+			GET_ALL.route, async ({memberRole: {role: roleId}, log}) => {
+				const route = ROUTES_PREFIX + GET_ALL.route;
+				await permissionRepository.checkPermissions(roleId, route, GET_ALL.request_method);
 				const allMembers = await memberRepository.getAllMembers();
 
 				return allMembers;
 			});
 
 		fastify.get<{ Params: IdParam }>(
-			GET.route ,{ schema: getOne },
-			async ({memberRole, params: { id } }) => {
-				const route = ROUTES_PREFIX+GET.route;
-				await permissionRepository.checkPermissions(memberRole.role,route,GET.request_method);
+			GET.route, {schema: getOne},
+			async ({memberRole: {role: roleId}, params: {id}}) => {
+				const route = ROUTES_PREFIX + GET.route;
+				await permissionRepository.checkPermissions(roleId, route, GET.request_method);
 				const member = await memberRepository.get(id);
 				return member;
 			});
+
 	}, { prefix: ROUTES_PREFIX });
 };
 

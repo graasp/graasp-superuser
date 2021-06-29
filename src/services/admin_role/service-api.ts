@@ -1,4 +1,4 @@
-import fastify, { FastifyPluginAsync } from 'fastify';
+import { FastifyPluginAsync } from 'fastify';
 import common from './schemas';
 import {AdminRoleRepository} from './repository';
 

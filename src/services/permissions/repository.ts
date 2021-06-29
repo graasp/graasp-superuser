@@ -1,4 +1,4 @@
-import { DatabaseTransactionHandler } from '../../plugins/db';
+import {DatabaseTransactionHandler} from '../../plugins/db';
 import {PermissionService} from './db-service';
 import {RequestNotAllowed} from '../../util/graasp-error';
 
@@ -12,10 +12,12 @@ export class PermissionRepository {
 	}
 
 	async checkPermissions(roleId,route,method) {
-		const permissions = await this.permissionService.getPermissions(roleId,this.handler);
-		const allowed = permissions.filter(({endpoint,requestMethod})=>
-			(route===endpoint|| endpoint==='*') && (method===requestMethod || requestMethod==='*'));
-		if(allowed.length===0) throw new RequestNotAllowed(roleId);
+		const permissions = await this.permissionService.getPermissions(roleId, this.handler);
+		console.log(roleId, route, method);
+		console.log(permissions);
+		const allowed = permissions.filter(({endpoint, requestMethod}) =>
+			(route === endpoint || endpoint === '*') && (method === requestMethod || requestMethod === '*'));
+		if (allowed.length === 0) throw new RequestNotAllowed(roleId);
 
 		return true;
 	}

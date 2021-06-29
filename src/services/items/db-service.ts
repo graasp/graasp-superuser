@@ -1,9 +1,6 @@
 // global
-import {
-	sql,
-	DatabaseTransactionConnectionType as TrxHandler
-} from 'slonik';
-import { UnknownExtra } from '../../interfaces/extra';
+import {DatabaseTransactionConnectionType as TrxHandler, sql} from 'slonik';
+import {UnknownExtra} from '../../interfaces/extra';
 
 import {Item} from '../../interfaces/item';
 
@@ -31,11 +28,23 @@ export class ItemService {
 	);
 
 
-	async getAllItems(dbHandler: TrxHandler):Promise<Item[]> {
+	async getAllItems<E extends UnknownExtra>(dbHandler: TrxHandler): Promise<Item<E>[]> {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		return dbHandler.query<Item>(sql`
+		return dbHandler.query<Item<E>>(sql`
        	SELECT ${ItemService.allColumns}
         FROM item`).then(({rows}) => rows.slice(0));
+	}
+
+	async get<E extends UnknownExtra>(id: string, transactionHandler: TrxHandler): Promise<Item<E>> {
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Item<E>>(sql`
+        SELECT ${ItemService.allColumns}
+        FROM item
+        WHERE id = ${id}
+      `)
+			.then(({rows}) => rows[0] || null);
 	}
 }

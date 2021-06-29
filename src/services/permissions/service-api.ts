@@ -1,4 +1,4 @@
-import fastify, { FastifyPluginAsync } from 'fastify';
+import {FastifyPluginAsync} from 'fastify';
 import common from './schemas';
 import {PermissionRepository} from './repository';
 import {ROUTES_PREFIX} from './routes';
@@ -15,9 +15,9 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 	fastify.register(async function (fastify) {
 		fastify.addHook('preHandler', fastify.verifyAuthentication);
 		fastify.get(
-			GET_ALL.route, async ({ memberRole, log }) => {
-				const route = ROUTES_PREFIX+GET_ALL.route;
-				await repository.checkPermissions(memberRole.role,route,GET_ALL.request_method);
+			GET_ALL.route, async ({memberRole: {role: roleId}, log}) => {
+				const route = ROUTES_PREFIX + GET_ALL.route;
+				await repository.checkPermissions(roleId, route, GET_ALL.request_method);
 				const allMembers = await repository.getAllPermissions();
 
 				return allMembers;
