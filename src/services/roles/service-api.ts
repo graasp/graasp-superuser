@@ -21,16 +21,15 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 	fastify.register(async function (fastify) {
 		fastify.addHook('preHandler', fastify.verifyAuthentication);
 		fastify.get(
-			GET_ALL.route, async ({ memberRole, log }) => {
-				const route = ROUTES_PREFIX+GET_ALL.route;
-				await permissionRepository.checkPermissions(memberRole.role,route,GET_ALL.request_method);
+			GET_ALL.path, async ({ memberRole, log }) => {
+				await permissionRepository.checkPermissions(memberRole.role,ROUTES_PREFIX,GET_ALL);
 				const allMembers = await roleRepository.getAllRoles();
 
 				return allMembers;
 			});
 
 		fastify.get(
-			GET.route ,
+			GET.path ,
 			async ({memberRole: {role: id} }) => {
 				const role = await roleRepository.getCurrentRole(id);
 				return role;

@@ -20,19 +20,17 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		fastify.addHook('preHandler', fastify.verifyAuthentication );
 
 		fastify.get(
-			GET_ALL.route, async ({memberRole: {role: roleId}, log}) => {
-				const route = ROUTES_PREFIX + GET_ALL.route;
-				await permissionRepository.checkPermissions(roleId, route, GET_ALL.request_method);
+			GET_ALL.path, async ({memberRole: {role: roleId}, log}) => {
+				await permissionRepository.checkPermissions(roleId, ROUTES_PREFIX, GET_ALL);
 				const allMembers = await memberRepository.getAllMembers();
 
 				return allMembers;
 			});
 
 		fastify.get<{ Params: IdParam }>(
-			GET.route, {schema: getOne},
+			GET.path, {schema: getOne},
 			async ({memberRole: {role: roleId}, params: {id}}) => {
-				const route = ROUTES_PREFIX + GET.route;
-				await permissionRepository.checkPermissions(roleId, route, GET.request_method);
+				await permissionRepository.checkPermissions(roleId, ROUTES_PREFIX, GET);
 				const member = await memberRepository.get(id);
 				return member;
 			});

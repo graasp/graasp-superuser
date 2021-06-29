@@ -13,7 +13,6 @@ export class RoleRepository {
 
 	async getCurrentRole(roleId) {
 		const role = await this.roleService.getRole(roleId,this.handler);
-		console.log(role);
 		return role;
 	}
 

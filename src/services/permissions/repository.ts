@@ -11,20 +11,28 @@ export class PermissionRepository {
 		this.handler = handler;
 	}
 
-	async checkPermissions(roleId,route,method) {
+	async checkPermissions(roleId,prefix,route) {
 		const permissions = await this.permissionService.getPermissions(roleId, this.handler);
-		const allowed = permissions.filter(({endpoint, requestMethod}) =>
-			(route === endpoint || endpoint === '*') && (method === requestMethod || requestMethod === '*'));
-		if (allowed.length === 0) throw new RequestNotAllowed(roleId);
+		const {path, method} = route;
 
+		const allowed =
+			permissions.filter(({endpoint, requestMethod}) => {
+				const endpointExpression = endpoint.replace('*','.*');
+				const requestMethodExpression = requestMethod.replace('*','.*');
+
+				const endpointRegex = new RegExp('^'+endpointExpression);
+				const requestMethodRegex = new RegExp(requestMethodExpression);
+
+				return (endpointRegex.test(prefix+path) && requestMethodRegex.test(method));
+			});
+
+		if (allowed.length === 0) throw new RequestNotAllowed(roleId);
 		return true;
 	}
 
 	async getPermissions(roleId) {
-		console.log(roleId);
 		const permissions = await this.permissionService.getPermissions(roleId,this.handler);
-		console.log(permissions);
-		return permissions;
+ 		return permissions;
 	}
 
 	async getAllPermissions() {
