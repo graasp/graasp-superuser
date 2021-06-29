@@ -15,10 +15,13 @@ import {ItemService} from './services/items/db-service';
 import ItemServiceAPI from './services/items/service-api';
 import {AdminRoleService} from './services/admin_role/db-service';
 import AdminRoleServiceAPI from './services/admin_role/service-api';
+import {PermissionService} from './services/permissions/db-service';
+import PermissionServiceAPI from './services/permissions/service-api';
 
 
 const decorateFastifyInstance: FastifyPluginAsync = async (fastify) => {
 	fastify.decorate('adminRole', { dbService: new AdminRoleService() });
+	fastify.decorate('permissions', { dbService: new PermissionService() });
 	fastify.decorate('members', { dbService: new MemberService() });
 	fastify.decorate('items', { dbService: new ItemService() });
 	fastify.decorateRequest('member', null);

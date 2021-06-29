@@ -134,6 +134,7 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
 
   fastify.decorate('verifyAuthentication', verifyAuthentication);
 
+
 };
 
 export default fp(plugin);

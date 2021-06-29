@@ -144,3 +144,11 @@ export const EMBEDDED_LINK_ITEM_IFRAMELY_HREF_ORIGIN = process.env.EMBEDDED_LINK
 // Graasp apps
 export const APPS_PLUGIN = process.env.APPS_PLUGIN;
 export const APPS_JWT_SECRET = process.env.APPS_JWT_SECRET;
+
+export enum REQUEST_METHODS  {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    PATCH = 'PATCH',
+    DELETE = 'DELETE'
+}

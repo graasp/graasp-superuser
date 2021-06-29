@@ -96,6 +96,7 @@ export class MemberNotFound extends BaseGraaspError {
     super({ code: 'GSUERR013', statusCode: 404, message: 'Member not found' }, data);
   }
 }
+
 export class CannotModifyOtherMembers extends BaseGraaspError {
   constructor(data?: unknown) {
     super({ code: 'GSUERR014', statusCode: 403, message: 'Member cannot modify other member' }, data);
@@ -104,6 +105,11 @@ export class CannotModifyOtherMembers extends BaseGraaspError {
 export class MemberNotAdmin extends BaseGraaspError {
   constructor(data?: unknown) {
     super({ code: 'GSUERR015', statusCode: 403, message: 'Member is not an Admin' }, data);
+  }
+}
+export class RequestNotAllowed extends BaseGraaspError {
+  constructor(data?: unknown) {
+    super({ code: 'GSUERR016', statusCode: 403, message: 'Member is not allowed to perform this request' }, data);
   }
 }
 export class DatabaseError extends BaseGraaspError {
