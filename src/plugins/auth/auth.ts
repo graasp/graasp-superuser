@@ -12,8 +12,13 @@ import fastifySecureSession from 'fastify-secure-session';
 import fastifyBearerAuth from 'fastify-bearer-auth';
 
 import {
-  AUTH_TOKEN_JWT_SECRET, AUTH_TOKEN_EXPIRATION_IN_MINUTES,
-  TOKEN_BASED_AUTH, REFRESH_TOKEN_JWT_SECRET, REFRESH_TOKEN_EXPIRATION_IN_MINUTES
+  AUTH_TOKEN_JWT_SECRET,
+  AUTH_TOKEN_EXPIRATION_IN_MINUTES,
+  TOKEN_BASED_AUTH,
+  REFRESH_TOKEN_JWT_SECRET,
+  REFRESH_TOKEN_EXPIRATION_IN_MINUTES,
+  LOGIN_TOKEN_EXPIRATION_IN_MINUTES,
+  JWT_SECRET, EMAIL_LINKS_HOST, PROTOCOL, CLIENT_HOST
 } from '../../util/config';
 
 // other services
@@ -134,7 +139,134 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
 
   fastify.decorate('verifyAuthentication', verifyAuthentication);
 
+  async function generateAuthTokensPair(memberId: string): Promise<{ authToken: string, refreshToken: string }> {
+    const [authToken, refreshToken] = await Promise.all([
+      promisifiedJwtSign(
+          { sub: memberId }, AUTH_TOKEN_JWT_SECRET,
+          { expiresIn: `${AUTH_TOKEN_EXPIRATION_IN_MINUTES}m` }
+      ),
+      promisifiedJwtSign(
+          { sub: memberId }, REFRESH_TOKEN_JWT_SECRET,
+          { expiresIn: `${REFRESH_TOKEN_EXPIRATION_IN_MINUTES}m` }
+      )
+    ]);
+    return { authToken, refreshToken };
+  }
 
+  fastify.decorate('generateAuthTokensPair', generateAuthTokensPair);
+
+  fastify.register(async function (fastify) {
+    async function generateLoginLinkAndEmailIt(member, reRegistrationAttempt?) {
+      // generate token with member info and expiration
+      const token = await promisifiedJwtSign({ sub: member.id }, JWT_SECRET,
+          { expiresIn: `${LOGIN_TOKEN_EXPIRATION_IN_MINUTES}m` });
+
+      const link = `${PROTOCOL}://${EMAIL_LINKS_HOST}/auth?t=${token}`;
+      // don't wait for mailer's response; log error and link if it fails.
+      fastify.mailer.sendLoginEmail(member, link, reRegistrationAttempt)
+          .catch(err => log.warn(err, `mailer failed. link: ${link}`));
+    }
+
+    // login
+    fastify.post<{ Body: { email: string } }>(
+        '/login',
+        { schema: login },
+        async ({ body, log }, reply) => {
+          const members = await memberRepository.getMatching(body);
+          const adminRole = await adminRoleRepository.getMemberRole(members[0].id);
+
+          if(!adminRole || !members) {
+          }
+          if (members.length && adminRole) {
+            const member = members[0];
+            await generateLoginLinkAndEmailIt(member);
+          }
+          else if(!members.length) {
+            const { email } = body;
+            log.warn(`Login attempt with non-existent email '${email}'`);
+          }
+          else if(!adminRole && members.length) {
+              const { email } = members[0];
+              log.warn(`${email} is not an Admin'`);
+          }
+
+          reply.status(204);
+        }
+    );
+
+    // authenticate
+    fastify.get<{ Querystring: { t: string } }>(
+        '/auth',
+        { schema: auth },
+        async (request, reply) => {
+          const { query: { t: token }, session } = request;
+
+          try {
+            // verify and extract member info
+            const { sub: memberId } = await promisifiedJwtVerify(token, JWT_SECRET, {});
+
+            // add member id to session
+            session.set('member', memberId);
+
+            if (CLIENT_HOST) {
+              reply.redirect(303, `//${CLIENT_HOST}`);
+            } else {
+              reply.status(204);
+            }
+          } catch (error) {
+            if (error instanceof JsonWebTokenError) {
+              session.delete();
+              reply.status(401);
+            }
+
+            throw error;
+          }
+        }
+    );
+
+    // logout
+    fastify.get(
+        '/logout',
+        async ({ session }, reply) => {
+          // remove session
+          session.delete();
+          reply.status(204);
+        }
+    );
+  });
+
+
+  // token based auth and endpoints
+  fastify.register(async function (fastify) {
+
+    fastify.decorateRequest('memberId', null);
+
+    fastify.get<{ Querystring: { t: string } }>(
+        '/auth',
+        { schema: auth },
+        async (request, reply) => {
+          const { query: { t: token } } = request;
+
+          try {
+            const { sub: memberId } = await promisifiedJwtVerify(token, JWT_SECRET, {});
+            // TODO: should we fetch/test the member from the DB?
+            return generateAuthTokensPair(memberId);
+          } catch (error) {
+            if (error instanceof JsonWebTokenError) {
+              reply.status(401);
+            }
+            throw error;
+          }
+        }
+    );
+
+    fastify.get(
+        '/auth/refresh',
+        { preHandler: fastify.verifyBearerAuth },
+        async ({ memberId }) => generateAuthTokensPair(memberId)
+    );
+
+  }, { prefix: '/m' });
 };
 
 export default fp(plugin);
