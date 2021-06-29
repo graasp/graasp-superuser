@@ -13,8 +13,6 @@ export class PermissionRepository {
 
 	async checkPermissions(roleId,route,method) {
 		const permissions = await this.permissionService.getPermissions(roleId, this.handler);
-		console.log(roleId, route, method);
-		console.log(permissions);
 		const allowed = permissions.filter(({endpoint, requestMethod}) =>
 			(route === endpoint || endpoint === '*') && (method === requestMethod || requestMethod === '*'));
 		if (allowed.length === 0) throw new RequestNotAllowed(roleId);

@@ -23,7 +23,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			GET_ALL.route, async (
 				{memberRole: {role: roleId}}
 			) => {
-				const route = ROUTES_PREFIX + GET.route;
+				const route = ROUTES_PREFIX + GET_ALL.route;
 				await permissionRepository.checkPermissions(roleId, route, GET_ALL.request_method);
 				const allItems = await itemsRepository.getAllItems();
 				return allItems;
