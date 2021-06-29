@@ -1,14 +1,12 @@
 export default {
-	$id: 'http://graasp.org/permissions/',
+	$id: 'http://graasp.org/role/',
 	definitions: {
 		member: {
 			type: 'object',
 			properties: {
 				id: { $ref: 'http://graasp.org/#/definitions/uuid' },
-				endpoint: { type: 'string' },
-				request_method: { type: 'string' },
 				description: { type: 'string' },
-			},
+				},
 			additionalProperties: false
 		},
 	}

@@ -13,11 +13,11 @@ create table if not exists permission
 create table if not exists role
 (
     id uuid default uuid_generate_v4() not null,
-    admin_role varchar(100) not null,
+    description varchar(100) not null,
     constraint role_pkey
         primary key (id),
-    constraint admin_role_key
-        unique (admin_role)
+    constraint description_key
+        unique (description)
 );
 
 create table if not exists role_permission
@@ -50,4 +50,4 @@ create table if not exists admin_role
         foreign key (role) references role,
     constraint admin_role_admin_fkey
         foreign key (admin) references member
-);
+);4
