@@ -18,12 +18,22 @@ export class PermissionService {
 	// the 'safe' way to dynamically generate the columns names:
 	private static allColumns = sql.join(
 		[
-			'id', 'endpoint', 'request_method','description',
+			'id', 'endpoint', ['request_method','requestMethod'],'description',
 		].map(c =>
 			!Array.isArray(c) ?
 				sql.identifier([c]) :
 				sql.join(c.map(cwa => sql.identifier([cwa])), sql` AS `)
 		),
+		sql`, `
+	);
+
+	private static allColumnsForJoins = sql.join(
+		[
+			[['permission', 'id'], ['id']],
+			[['permission', 'description'], ['description']],
+			[['permission', 'endpoint'], ['endpoint']],
+			[['permission', 'request_method'], ['requestMethod']],
+		].map(c => sql.join(c.map(cwa => sql.identifier(cwa)), sql` AS `)),
 		sql`, `
 	);
 
@@ -33,14 +43,24 @@ export class PermissionService {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		.query<Permission>(sql`
-				SELECT public.permission.*
-				FROM public.role
-				JOIN public.role_permission
-				ON public.role_permission.role = public.role.id
-				JOIN public.permission
-				ON public.role_permission.permission = public.permission.id
+					SELECT ${PermissionService.allColumnsForJoins}
+					FROM permission
+					INNER JOIN role_permission
+					ON permission.id = role_permission.permission
+					JOIN role
+					ON role_permission.role = role.id
+					
+					WHERE role.id = ${id}
+			`).then(({rows}) => rows.slice(0));
+	}
 
-				WHERE public.role.id = ${id}
+	async getAllPermissions(dbHandler: TrxHandler): Promise<Permission[]> {
+
+		return dbHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Permission>(sql`
+				SELECT ${PermissionService.allColumns} FROM permission
 			`).then(({rows}) => rows.slice(0));
 	}
 }

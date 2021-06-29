@@ -4,9 +4,9 @@ export default {
 		member: {
 			type: 'object',
 			properties: {
-				id: { $ref: 'http://graasp.org/#/definitions/uuid' },
+				id: { type: 'string'},
 				endpoint: { type: 'string' },
-				request_method: { type: 'string' },
+				requestMethod: { type: 'string' },
 				description: { type: 'string' },
 			},
 			additionalProperties: false
