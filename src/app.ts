@@ -29,7 +29,7 @@ const decorateFastifyInstance: FastifyPluginAsync = async (fastify) => {
 	fastify.decorate('role', { dbService: new RoleService() });
 	fastify.decorateRequest('member', null);
 	fastify.decorateRequest('memberRole', null);
-
+	fastify.decorateRequest('permission', null);
 };
 
 const instance = fastify({ logger: !DISABLE_LOGS });
@@ -48,7 +48,6 @@ instance
 		fromEmail: MAILER_CONFIG_FROM_EMAIL
 	})
 	.register(authPlugin, { sessionCookieDomain: (ENVIRONMENT === 'staging' ? 'ielsrv7.epfl.ch' : null) });
-
 
 instance.register(async (instance) =>{
 	instance.register(fp(MemberServiceAPI));

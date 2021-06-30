@@ -1,8 +1,7 @@
 import {FastifyPluginAsync} from 'fastify';
 import common from './schemas';
 import {PermissionRepository} from './repository';
-import {ROUTES_PREFIX} from './routes';
-import {GET, GET_ALL} from '../members/routes';
+import {ROUTES_PREFIX,GET,GET_ALL} from './routes';
 
 const plugin: FastifyPluginAsync = async (fastify) => {
 	const { permissions, db } = fastify;
@@ -13,7 +12,11 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 	fastify.addSchema(common);
 
 	fastify.register(async function (fastify) {
-		fastify.addHook('preHandler', fastify.verifyAuthentication);
+		fastify.addHook('preHandler', async function (request, reply) {
+			await fastify.verifyAuthentication(request,reply);
+			await fastify.verifyPermission(request,reply);
+		});
+
 		fastify.get(
 			GET_ALL.path, async ({memberRole: {role: roleId}, log}) => {
 				await repository.checkPermissions(roleId, ROUTES_PREFIX,GET_ALL);
@@ -21,6 +24,11 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 
 				return allMembers;
 			});
+
+	}, { prefix: ROUTES_PREFIX });
+
+	fastify.register(async function (fastify) {
+		fastify.addHook('preHandler', fastify.verifyAuthentication);
 
 		fastify.get(
 			GET.path ,

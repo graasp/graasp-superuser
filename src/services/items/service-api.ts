@@ -1,9 +1,9 @@
 import {FastifyPluginAsync} from 'fastify';
-import common from './schemas';
+import common, {getChildren} from './schemas';
 import {ItemRepository} from './repository';
-import {GET, GET_ALL, ROUTES_PREFIX} from './routes';
+import {GET, GET_ALL, GET_CHILDREN, ROUTES_PREFIX} from './routes';
 import {PermissionRepository} from '../permissions/repository';
-import {IdParam} from '../../interfaces/requests';
+import {ChildrenParam, IdParam} from '../../interfaces/requests';
 import {getOne} from '../members/schemas';
 
 const plugin: FastifyPluginAsync = async (fastify) => {
@@ -17,7 +17,10 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 
 	fastify.register(async function (fastify) {
 
-		fastify.addHook('preHandler', fastify.verifyAuthentication);
+		fastify.addHook('preHandler', async function (request, reply) {
+			await fastify.verifyAuthentication(request,reply);
+			await fastify.verifyPermission(request,reply);
+		});
 
 		fastify.get(
 			GET_ALL.path, async (
@@ -35,6 +38,16 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 				const item = await itemsRepository.get(id);
 				return item;
 			});
+
+		fastify.get<{ Params: ChildrenParam}>(
+			GET_CHILDREN.path, {schema: getChildren},
+			async ({memberRole: {role: roleId}, params: {id,direction,level}}) => {
+				console.log(level,direction,id);
+				await permissionRepository.checkPermissions(roleId, ROUTES_PREFIX, GET_CHILDREN);
+				const children = await itemsRepository.getChildren(id,direction,level);
+
+			});
+
 	}, { prefix: ROUTES_PREFIX });
 };
 

@@ -1,8 +1,19 @@
 import S from 'fluent-json-schema';
+import {DIRECTION, LEVEL} from '../util/config';
 
 export const uuid =
   S.string()
     .pattern('^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$');
+
+export const direction =
+        S.integer().enum(Object.values(DIRECTION)).default(DIRECTION.ASC);
+
+
+export const level =
+    S.oneOf([
+        S.integer().minimum(1),
+        S.string().enum(Object.values(LEVEL))
+    ]).default(1);
 
 export const itemPath =
   S.string()
@@ -46,6 +57,9 @@ const shared = S.object()
   .definition('itemPath', itemPath)
   .definition('idParam', idParam)
   .definition('idsQuery', idsQuery)
-  .definition('error', error);
+  .definition('error', error)
+    .definition('direction',direction)
+    .definition('level',level)
+;
 
 export default shared;

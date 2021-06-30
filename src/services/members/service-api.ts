@@ -17,7 +17,10 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 
 	fastify.register(async function (fastify) {
 
-		fastify.addHook('preHandler', fastify.verifyAuthentication );
+		fastify.addHook('preHandler', async function (request, reply) {
+			await fastify.verifyAuthentication(request,reply);
+			await fastify.verifyPermission(request,reply);
+		});
 
 		fastify.get(
 			GET_ALL.path, async ({memberRole: {role: roleId}, log}) => {

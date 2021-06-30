@@ -11,9 +11,8 @@ export class PermissionRepository {
 		this.handler = handler;
 	}
 
-	async checkPermissions(roleId,prefix,route) {
+	async checkPermissions(roleId,path,method) {
 		const permissions = await this.permissionService.getPermissions(roleId, this.handler);
-		const {path, method} = route;
 
 		const allowed =
 			permissions.filter(({endpoint, requestMethod}) => {
@@ -23,11 +22,10 @@ export class PermissionRepository {
 				const endpointRegex = new RegExp('^'+endpointExpression);
 				const requestMethodRegex = new RegExp(requestMethodExpression);
 
-				return (endpointRegex.test(prefix+path) && requestMethodRegex.test(method));
+				return (endpointRegex.test(path) && requestMethodRegex.test(method));
 			});
 
-		if (allowed.length === 0) throw new RequestNotAllowed(roleId);
-		return true;
+		return allowed;
 	}
 
 	async getPermissions(roleId) {

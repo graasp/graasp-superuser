@@ -7,6 +7,6 @@ export const GET_ALL = {
 };
 
 export const GET = {
-	route: '/getAdminPermissions',
+	path: '/getAdminPermissions',
 	method: REQUEST_METHODS.GET
 };

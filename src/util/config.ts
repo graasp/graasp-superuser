@@ -152,3 +152,12 @@ export enum REQUEST_METHODS  {
     PATCH = 'PATCH',
     DELETE = 'DELETE'
 }
+
+export const DIRECTION = {
+    ASC: 'ASC',
+    DESC: 'DESC'
+};
+
+export const LEVEL = {
+    ALL: 'ALL'
+};

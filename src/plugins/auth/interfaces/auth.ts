@@ -28,6 +28,8 @@ declare module 'fastify' {
      * Generate auth+refresh tokens pair for token base auth
      */
     generateAuthTokensPair: (memberId: string) => Promise<{ authToken: string, refreshToken: string }>;
+
+    verifyPermission: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 }
 

@@ -7,6 +7,6 @@ export const GET_ALL = {
 };
 
 export const GET = {
-	route: '/getCurrentRole',
+	path: '/getCurrentRole',
 	method: REQUEST_METHODS.GET
 };

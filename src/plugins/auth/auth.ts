@@ -29,6 +29,9 @@ import { register, login, auth } from './schemas';
 import { AuthPluginOptions } from './interfaces/auth';
 import {MemberRepository} from '../../services/members/repository';
 import {AdminRoleRepository} from '../../services/admin_role/repository';
+import {GET_ALL, ROUTES_PREFIX} from '../../services/members/routes';
+import {PermissionRepository} from '../../services/permissions/repository';
+import {RequestNotAllowed} from '../../util/graasp-error';
 
 const promisifiedJwtVerify = promisify<string, Secret, VerifyOptions, { sub: string }>(jwt.verify);
 const promisifiedJwtSign = promisify<{ sub: string }, Secret, SignOptions, string>(jwt.sign);
@@ -38,9 +41,10 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
     sessionCookieDomain: domain,
     uniqueViolationErrorName = 'UniqueIntegrityConstraintViolationError' // TODO: can we improve this?
   } = options;
-  const { log, db, members: { dbService: mS }, adminRole: { dbService: rS} } = fastify;
+  const { log, db, members: { dbService: mS }, adminRole: { dbService: rS}, permissions: { dbService: pS} } = fastify;
   const  memberRepository = new MemberRepository(mS,db.pool);
   const adminRoleRepository = new AdminRoleRepository(rS,db.pool);
+  const permissionRepository = new PermissionRepository(pS,db.pool);
 
   // cookie based auth
   fastify.register(fastifySecureSession, {
@@ -50,7 +54,7 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
     cookie: { domain, path: '/' }
   });
 
-  async function verifyMemberInSession(request: FastifyRequest, reply: FastifyReply) {
+    async function verifyMemberInSession(request: FastifyRequest, reply: FastifyReply) {
     const { session } = request;
     const memberId = session.get('member');
 
@@ -139,6 +143,16 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
 
   fastify.decorate('verifyAuthentication', verifyAuthentication);
 
+
+
+  async function verifyPermission(request: FastifyRequest, reply: FastifyReply){
+        const { memberRole: {role: roleId},routerMethod,routerPath} = request;
+        const permission = await permissionRepository.checkPermissions(roleId,routerPath,routerMethod);
+        if (permission.length === 0) throw new RequestNotAllowed(roleId);
+  }
+
+  fastify.decorate('verifyPermission',verifyPermission);
+
   async function generateAuthTokensPair(memberId: string): Promise<{ authToken: string, refreshToken: string }> {
     const [authToken, refreshToken] = await Promise.all([
       promisifiedJwtSign(
@@ -154,6 +168,9 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
   }
 
   fastify.decorate('generateAuthTokensPair', generateAuthTokensPair);
+
+
+
 
   fastify.register(async function (fastify) {
     async function generateLoginLinkAndEmailIt(member, reRegistrationAttempt?) {

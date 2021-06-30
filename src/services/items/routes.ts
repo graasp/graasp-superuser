@@ -10,3 +10,8 @@ export const GET = {
 	path: '/:id',
 	method: REQUEST_METHODS.GET
 };
+
+export const GET_CHILDREN = {
+	path: '/getChildren/:id/:direction?/:level?',
+	method: REQUEST_METHODS.GET
+};
