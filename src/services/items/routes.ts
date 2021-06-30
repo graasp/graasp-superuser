@@ -12,6 +12,6 @@ export const GET = {
 };
 
 export const GET_CHILDREN = {
-	path: '/getChildren/:id/:direction?/:level?',
+	path: '/children/:id',
 	method: REQUEST_METHODS.GET
 };

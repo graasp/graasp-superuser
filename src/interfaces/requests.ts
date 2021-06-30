@@ -1,8 +1,7 @@
 export interface IdParam { id: string }
 export interface ChildrenParam {
-	id: string,
-	direction: string
-	level: string
+	level?: any
+	direction?: string
 }
 export interface IdsParams { id: string[] }
 export interface ParentIdParam { parentId?: string }

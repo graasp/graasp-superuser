@@ -98,15 +98,11 @@ const getOne = {
 
 // schema for getting one item's children
 const getChildren = {
-	params: {
-		type: 'object',
-		required: ['id'],
-		properties: {
-			id: { $ref: 'http://graasp.org/#/definitions/uuid' },
-			direction: { $ref: 'http://graasp.org/#/definitions/direction' },
-			level: { $ref: 'http://graasp.org/#/definitions/level' },
-		},
-		additionalProperties: false
+	params: { id: { $ref: 'http://graasp.org/#/definitions/uuid' },
+	},
+	querystring: {
+		direction: { $ref: 'http://graasp.org/#/definitions/direction' },
+		level: { $ref: 'http://graasp.org/#/definitions/level' },
 	},
 	response: {
 		200: {

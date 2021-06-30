@@ -6,7 +6,7 @@ export const uuid =
     .pattern('^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$');
 
 export const direction =
-        S.integer().enum(Object.values(DIRECTION)).default(DIRECTION.ASC);
+        S.string().enum(Object.values(DIRECTION)).default(DIRECTION.ASC);
 
 
 export const level =
