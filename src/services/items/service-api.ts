@@ -25,23 +25,21 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		});
 
 		fastify.get(
-			GET_ALL.path, async (
-				{memberRole: {role: roleId}}
-			) => {
+			GET_ALL.path, async () => {
 				const allItems = await itemsRepository.getAllItems();
 				return allItems;
 			});
 
 		fastify.get<{ Params: IdParam }>(
 			GET.path, {schema: getOne},
-			async ({memberRole: {role: roleId}, params: {id}}) => {
+			async ({ params: {id}}) => {
 				const item = await itemsRepository.get(id);
 				return item;
 			});
 
 		fastify.get<{ Params: IdParam,Querystring: ChildrenParam}>(
 			GET_CHILDREN.path, {schema: getChildren},
-			async ({memberRole: {role: roleId}, params:{id},query:{level, direction} }) => {
+			async ({ params:{id},query:{level, direction} }) => {
 				const children = await itemsRepository.getChildren(id,direction,level);
 				return children;
 			});

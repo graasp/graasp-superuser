@@ -23,8 +23,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		});
 
 		fastify.get(
-			GET_ALL.path, async ({memberRole: {role: roleId}, log}) => {
-				await permissionRepository.checkPermissions(roleId, ROUTES_PREFIX, GET_ALL);
+			GET_ALL.path, async () => {
 				const allMembers = await memberRepository.getAllMembers();
 
 				return allMembers;
@@ -32,8 +31,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 
 		fastify.get<{ Params: IdParam }>(
 			GET.path, {schema: getOne},
-			async ({memberRole: {role: roleId}, params: {id}}) => {
-				await permissionRepository.checkPermissions(roleId, ROUTES_PREFIX, GET);
+			async ({ params: {id}}) => {
 				const member = await memberRepository.get(id);
 				return member;
 			});
