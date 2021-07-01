@@ -30,6 +30,8 @@ declare module 'fastify' {
     generateAuthTokensPair: (memberId: string) => Promise<{ authToken: string, refreshToken: string }>;
 
     verifyPermission: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+
+    verifyAuthAndPermission: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 }
 

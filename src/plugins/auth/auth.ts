@@ -147,11 +147,28 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
 
   async function verifyPermission(request: FastifyRequest, reply: FastifyReply){
         const { memberRole: {role: roleId},routerMethod,routerPath} = request;
+        console.log(roleId,routerMethod,routerPath);
         const permission = await permissionRepository.checkPermissions(roleId,routerPath,routerMethod);
+        console.log(permission);
         if (permission.length === 0) throw new RequestNotAllowed(roleId);
   }
 
   fastify.decorate('verifyPermission',verifyPermission);
+
+  const verifyAuthAndPermission = TOKEN_BASED_AUTH ?
+      fastify.auth([verifyMemberInSession, fastify.verifyBearerAuth,fastify.verifyPermission],
+          {
+              relation: 'and',
+              run: 'all'
+          }) :
+      fastify.auth([verifyMemberInSession, fastify.verifyPermission],
+          {
+          relation: 'and',
+          run: 'all'
+      });
+
+
+  fastify.decorate('verifyAuthAndPermission',verifyAuthAndPermission);
 
   async function generateAuthTokensPair(memberId: string): Promise<{ authToken: string, refreshToken: string }> {
     const [authToken, refreshToken] = await Promise.all([

@@ -1,12 +1,4 @@
-import {REQUEST_METHODS} from '../../util/config';
-
 export const ROUTES_PREFIX = '/permissions';
-export const GET_ALL = {
-	path: '/getAll',
-	method: REQUEST_METHODS.GET
-};
+export const GET_ALL = '/all';
 
-export const GET = {
-	path: '/getAdminPermissions',
-	method: REQUEST_METHODS.GET
-};
+export const GET = '/admin-permissions';
