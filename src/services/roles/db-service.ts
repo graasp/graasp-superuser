@@ -5,6 +5,7 @@ import {
 } from 'slonik';
 
 import {Role} from '../../interfaces/role';
+import {Permission} from '../../interfaces/permission';
 
 declare module 'fastify' {
 	interface FastifyInstance {
@@ -47,5 +48,43 @@ export class RoleService {
 				FROM role 
 				WHERE id = ${id}
 			`).then(({rows}) => rows[0]);
+	}
+
+	async getPermissions(role: Role, transactionHandler: TrxHandler): Promise<Role> {
+		const { description } = role;
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Role>(sql`
+        INSERT INTO role (description)
+        VALUES (${description})
+        RETURNING ${RoleService.allColumns}
+      `)
+			.then(({ rows }) => rows[0]);
+	}
+
+	async create(role: Role, transactionHandler: TrxHandler): Promise<Role> {
+		const { description } = role;
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Role>(sql`
+        INSERT INTO role (description)
+        VALUES (${description})
+        RETURNING ${RoleService.allColumns}
+      `)
+			.then(({ rows }) => rows[0]);
+	}
+
+	async delete(id: string, transactionHandler: TrxHandler): Promise<Role> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		return transactionHandler.query<Role>(sql`
+        DELETE FROM role
+        WHERE id = ${id}
+        RETURNING ${RoleService.allColumns}
+      `).then(({ rows }) => rows[0] || null);
 	}
 }

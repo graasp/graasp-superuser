@@ -1,7 +1,7 @@
 import {DatabaseTransactionHandler} from '../../plugins/db';
 import {PermissionService} from './db-service';
 import {DeleteSuperUserPermission, RequestNotAllowed} from '../../util/graasp-error';
-import {BasePermission} from './permission';
+import {BasePermission} from './base-permission';
 
 export class PermissionRepository {
 	protected permissionService: PermissionService;
@@ -38,7 +38,7 @@ export class PermissionRepository {
 		return permissions.map((permission) => BasePermission.getReadableFormat(permission));
 	}
 
-	async getPermissionByRole (roleId) {
+	async getPermissionsByRole (roleId) {
 		const result = await this.permissionService.getPermissions(roleId,this.handler);
 
 		return result;

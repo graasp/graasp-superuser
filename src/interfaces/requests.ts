@@ -10,6 +10,9 @@ export interface PermissionBody {
 	description: string,
 	method: string
 }
+export interface RoleBody {
+	description:string
+}
 export interface RoleParam {
 	roleId?: string
 }

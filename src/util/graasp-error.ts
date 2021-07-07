@@ -119,6 +119,12 @@ export class DeleteSuperUserPermission extends BaseGraaspError {
   }
 }
 
+export class DeleteSuperUserRole extends BaseGraaspError {
+  constructor(data?: unknown) {
+    super({ code: 'GSUERR017', statusCode: 403, message: 'Role with superuser permission cannot be deleted' }, data);
+  }
+}
+
 export class DatabaseError extends BaseGraaspError {
   constructor(data?: unknown) {
     super({ code: 'GSUERR998', statusCode: 500, message: 'Database error' }, data);

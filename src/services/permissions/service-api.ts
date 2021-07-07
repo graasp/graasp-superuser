@@ -30,8 +30,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 				console.log(roleId);
 
 				if(roleId){
-					const permissions = await repository.getPermissionByRole(roleId);
-
+					const permissions = await repository.getPermissionsByRole(roleId);
 					return permissions;
 				}
 				else{
