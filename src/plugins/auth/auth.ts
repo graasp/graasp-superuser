@@ -146,10 +146,8 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
 
 
   async function verifyPermission(request: FastifyRequest, reply: FastifyReply){
-        const { memberRole: {role: roleId},routerMethod,routerPath} = request;
-        console.log(roleId,routerMethod,routerPath);
-        const permission = await permissionRepository.checkPermissions(roleId,routerPath,routerMethod);
-        console.log(permission);
+        const { memberRole: {role: roleId},routerMethod,url} = request;
+        const permission = await permissionRepository.checkPermissions(roleId,url,routerMethod);
         if (permission.length === 0) throw new RequestNotAllowed(roleId);
   }
 

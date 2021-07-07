@@ -28,10 +28,10 @@ export class ItemService {
 	);
 
 
-	async getAllItems<E extends UnknownExtra>(dbHandler: TrxHandler): Promise<Item<E>[]> {
+	async getAllItems<E extends UnknownExtra>(transactionHandler: TrxHandler): Promise<Item<E>[]> {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		return dbHandler.query<Item<E>>(sql`
+		return transactionHandler.query<Item<E>>(sql`
        	SELECT ${ItemService.allColumns}
         FROM item`).then(({rows}) => rows.slice(0));
 	}

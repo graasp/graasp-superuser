@@ -27,9 +27,9 @@ export class RoleService {
 		sql`, `
 	);
 
-	async getAllRoles(dbHandler: TrxHandler): Promise<Role[]> {
+	async getAllRoles(transactionHandler: TrxHandler): Promise<Role[]> {
 
-		return dbHandler
+		return transactionHandler
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		.query<Role>(sql`
@@ -37,9 +37,9 @@ export class RoleService {
 			`).then(({rows}) => rows.slice(0));
 	}
 
-	async getRole(id: string, dbHandler: TrxHandler): Promise<Role> {
+	async getRole(id: string, transactionHandler: TrxHandler): Promise<Role> {
 
-		return dbHandler
+		return transactionHandler
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			.query<Role>(sql`

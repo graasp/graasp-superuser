@@ -5,6 +5,7 @@ import {
 } from 'slonik';
 
 import {Permission} from '../../interfaces/permission';
+import {Item} from '../../interfaces/item';
 
 declare module 'fastify' {
 	interface FastifyInstance {
@@ -37,9 +38,9 @@ export class PermissionService {
 		sql`, `
 	);
 
-	async getPermissions(id: string, dbHandler: TrxHandler): Promise<Permission[]> {
+	async getPermissions(id: string, transactionHandler: TrxHandler): Promise<Permission[]> {
 
-		return dbHandler
+		return transactionHandler
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		.query<Permission>(sql`
@@ -54,13 +55,50 @@ export class PermissionService {
 			`).then(({rows}) => rows.slice(0));
 	}
 
-	async getAllPermissions(dbHandler: TrxHandler): Promise<Permission[]> {
+	async getAllPermissions(transactionHandler: TrxHandler): Promise<Permission[]> {
 
-		return dbHandler
+		return transactionHandler
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			.query<Permission>(sql`
 				SELECT ${PermissionService.allColumns} FROM permission
 			`).then(({rows}) => rows.slice(0));
+	}
+
+	async get(id: string,transactionHandler: TrxHandler): Promise<Permission> {
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Permission>(sql`
+        SELECT ${PermissionService.allColumns}
+        FROM permission
+        WHERE id = ${id}
+      `)
+			.then(({rows}) => rows[0] || null);
+	}
+
+	async create(permission: Permission, transactionHandler: TrxHandler): Promise<Permission> {
+		const { description, endpoint, requestMethod } = permission;
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Permission>(sql`
+        INSERT INTO permission (endpoint, request_method, description)
+        VALUES (${endpoint}, ${requestMethod}, ${description})
+        RETURNING ${PermissionService.allColumns}
+      `)
+			.then(({ rows }) => rows[0]);
+	}
+
+	async delete(id: string, transactionHandler: TrxHandler): Promise<Permission> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		return transactionHandler.query<Permission>(sql`
+        DELETE FROM permission
+        WHERE id = ${id}
+        RETURNING ${PermissionService.allColumns}
+      `).then(({ rows }) => rows[0] || null);
 	}
 }

@@ -31,17 +31,17 @@ export class MemberService {
 	);
 
 
-	async getAllMembers(dbHandler: TrxHandler):Promise<Member[]> {
+	async getAllMembers(transactionHandler: TrxHandler):Promise<Member[]> {
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		return dbHandler.query<Member>(sql`
+		return transactionHandler.query<Member>(sql`
        	SELECT ${MemberService.allColumns}
         FROM member`).then(({rows}) => rows.slice(0));
 
 	}
 
-	async getMatching(member: Partial<Member>, dbHandler: TrxHandler, properties?: (keyof Member)[]): Promise<Member[]> {
+	async getMatching(member: Partial<Member>, transactionHandler: TrxHandler, properties?: (keyof Member)[]): Promise<Member[]> {
 		let selectColumns;
 
 		if (properties && properties.length) {
@@ -61,7 +61,7 @@ export class MemberService {
 			sql` AND `
 		);
 
-		return dbHandler
+		return transactionHandler
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			.query<Member>(sql`
@@ -76,10 +76,10 @@ export class MemberService {
 	/**
 	 * Get member matching the given `id` or `null`, if not found.
 	 * @param id Member's id
-	 * @param dbHandler Database handler
+	 * @param transactionHandler Database handler
 	 * @param properties List of Member properties to fetch - defaults to 'all'
 	 */
-	async get<E extends UnknownExtra>(id: string, dbHandler: TrxHandler, properties?: (keyof Member)[]): Promise<Member<E>> {
+	async get<E extends UnknownExtra>(id: string, transactionHandler: TrxHandler, properties?: (keyof Member)[]): Promise<Member<E>> {
 		let selectColumns;
 
 		if (properties && properties.length) {
@@ -89,7 +89,7 @@ export class MemberService {
 			);
 		}
 
-		return dbHandler
+		return transactionHandler
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			.query<Member<E>>(sql`

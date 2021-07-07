@@ -28,9 +28,9 @@ export class AdminRoleService {
 		sql`, `
 	);
 
-	async getMemberRole(id: string, dbHandler: TrxHandler): Promise<AdminRole> {
+	async getMemberRole(id: string, transactionHandler: TrxHandler): Promise<AdminRole> {
 
-		return dbHandler
+		return transactionHandler
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		.query<Role>(sql`

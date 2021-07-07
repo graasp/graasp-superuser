@@ -22,6 +22,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 				return allMembers;
 			});
 
+
 	}, { prefix: ROUTES_PREFIX });
 
 	fastify.register(async function (fastify) {

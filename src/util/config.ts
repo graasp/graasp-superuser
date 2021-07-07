@@ -158,6 +158,17 @@ export const DIRECTION = {
     DESC: 'DESC'
 };
 
+export const METHODS = {
+    GET: 'GET',
+    POST: 'POST',
+    PATCH: 'PATCH',
+    DELETE: 'DELETE',
+    ALL: 'ALL'
+};
+
 export const LEVEL = {
     ALL: 'ALL'
 };
+
+export const ALL_SYMBOL = '^.*';
+

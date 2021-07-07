@@ -112,6 +112,13 @@ export class RequestNotAllowed extends BaseGraaspError {
     super({ code: 'GSUERR016', statusCode: 403, message: 'Member is not allowed to perform this request' }, data);
   }
 }
+
+export class DeleteSuperUserPermission extends BaseGraaspError {
+  constructor(data?: unknown) {
+    super({ code: 'GSUERR017', statusCode: 403, message: 'SuperUser permission cannot be deleted' }, data);
+  }
+}
+
 export class DatabaseError extends BaseGraaspError {
   constructor(data?: unknown) {
     super({ code: 'GSUERR998', statusCode: 500, message: 'Database error' }, data);
