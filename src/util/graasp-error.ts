@@ -125,6 +125,18 @@ export class DeleteSuperUserRole extends BaseGraaspError {
   }
 }
 
+export class CreateSuperUserRolePermission extends BaseGraaspError {
+  constructor() {
+    super({ code: 'GSUERR018', statusCode: 403, message: 'Only SuperUsers can assign SuperUser privilege to a Role' });
+  }
+}
+
+export class DeleteSuperUserRolePermission extends BaseGraaspError {
+  constructor() {
+    super({ code: 'GSUERR019', statusCode: 403, message: 'Only SuperUsers can delete SuperUser privilege to a Role' });
+  }
+}
+
 export class DatabaseError extends BaseGraaspError {
   constructor(data?: unknown) {
     super({ code: 'GSUERR998', statusCode: 500, message: 'Database error' }, data);

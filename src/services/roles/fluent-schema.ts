@@ -1,4 +1,4 @@
-import {error, requestMethod, uuid} from '../../schemas/fluent-schema';
+import {error, idParam, requestMethod, uuid} from '../../schemas/fluent-schema';
 import S from 'fluent-json-schema';
 
 const role = S.object()
@@ -11,6 +11,26 @@ export const createRole = {
 		.prop('description',S.string()),
 	response: {
 		200: role,
+		'4xx': error
+	}
+};
+
+export const createRolePermission = {
+	params: { $ref: 'http://graasp.org/#/definitions/idParam' },
+	body: S.object().additionalProperties(false)
+		.prop('permissionId',uuid)
+		.required(['permissionId']),
+	response: {
+		'4xx': error
+	}
+};
+
+export const deleteRolePermission = {
+	params: { $ref: 'http://graasp.org/#/definitions/idParam' },
+	body: S.object().additionalProperties(false)
+		.prop('permissionId',uuid)
+		.required(['permissionId']),
+	response: {
 		'4xx': error
 	}
 };

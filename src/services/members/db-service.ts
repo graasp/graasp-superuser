@@ -99,4 +99,22 @@ export class MemberService {
       `)
 			.then(({ rows }) => rows[0]);
 	}
+
+	async createMemberRole(memberId: string, roleId: string, transactionHandler: TrxHandler): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		await transactionHandler.query(sql`
+        INSERT INTO admin_role (admin,role)
+        VALUES (${memberId},${roleId})
+      `);
+	}
+
+	async deleteMemberRole(memberId: string, roleId: string, transactionHandler: TrxHandler): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		await transactionHandler.query(sql`
+        DELETE FROM role_permission
+        WHERE admin = ${memberId} AND role = ${roleId}
+      `);
+	}
 }

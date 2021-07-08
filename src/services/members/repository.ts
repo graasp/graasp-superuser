@@ -27,5 +27,4 @@ export class MemberRepository<E extends UnknownExtra>  {
 		if(!member) throw new MemberNotFound(memberId);
 		return member;
 	}
-
 }

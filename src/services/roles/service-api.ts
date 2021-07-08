@@ -1,11 +1,11 @@
 import { FastifyPluginAsync } from 'fastify';
 import common from './schemas';
 import {RoleRepository} from './repository';
-import {ROUTES_PREFIX,GET,GET_ALL, DELETE, POST} from './routes';
-import {IdParam, PermissionBody} from '../../interfaces/requests';
+import {ROUTES_PREFIX, GET, GET_ALL, DELETE, POST_ROLE_PERMISSION, POST, DELETE_ROLE_PERMISSION} from './routes';
+import {IdParam, PermissionBody, PermissionIdParam} from '../../interfaces/requests';
 import {createPermission, deletePermission} from '../permissions/fluent-schema';
 import {Role} from '../../interfaces/role';
-import {createRole} from './fluent-schema';
+import {createRole, createRolePermission, deleteRolePermission} from './fluent-schema';
 import {PermissionRepository} from '../permissions/repository';
 
 const plugin: FastifyPluginAsync = async (fastify) => {
@@ -37,8 +37,6 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			}
 		);
 
-
-
 		fastify.delete<{ Params: IdParam }>(
 			DELETE, { schema: deletePermission },
 			async ({  params: {id}, log }) => {
@@ -48,6 +46,26 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			}
 		);
 
+		fastify.post<{ Params: IdParam, Body: PermissionIdParam }>(
+			POST_ROLE_PERMISSION, { schema: createRolePermission  },
+			async ({ params: {id}, body, log },reply) => {
+				const { permissionId } = body;
+				const permission = await permissionRepository.getPermission(permissionId);
+				const rolePermissions = await permissionRepository.getPermissionsByRole(id);
+				await roleRepository.createRolePermission(permission,rolePermissions,id);
+				reply.status(204);			}
+		);
+
+		fastify.delete<{ Params: IdParam, Body: PermissionIdParam }>(
+			DELETE_ROLE_PERMISSION, { schema: deleteRolePermission  },
+			async ({ params: {id}, body, log },reply) => {
+				const { permissionId } = body;
+				const permission = await permissionRepository.getPermission(permissionId);
+				const rolePermissions = await permissionRepository.getPermissionsByRole(id);
+				await roleRepository.deleteRolePermission(permission,rolePermissions,id);
+				reply.status(204);
+			}
+		);
 
 	}, { prefix: ROUTES_PREFIX });
 

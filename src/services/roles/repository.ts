@@ -1,6 +1,11 @@
 import { DatabaseTransactionHandler } from '../../plugins/db';
 import {RoleService} from './db-service';
-import {DeleteSuperUserPermission, DeleteSuperUserRole, MemberNotAdmin} from '../../util/graasp-error';
+import {
+	CreateSuperUserRolePermission,
+	DeleteSuperUserPermission,
+	DeleteSuperUserRole, DeleteSuperUserRolePermission,
+	MemberNotAdmin,
+} from '../../util/graasp-error';
 import {BasePermission} from '../permissions/base-permission';
 import {BaseRole} from './base-role';
 import {Permission} from '../../interfaces/permission';
@@ -32,11 +37,26 @@ export class RoleRepository {
 
 	async deleteRole(id,permissions: Permission[]) {
 
-		for ( const permission of permissions) {
-			if(BasePermission.checkSuperUserPermission(permission)) throw new DeleteSuperUserRole(id);
-		}
+		if(BasePermission.checkSuperUserPermission(permissions)) throw new DeleteSuperUserRole(id);
+
 
 		const result = await this.roleService.delete(id,this.handler);
 		return result;
+	}
+
+	async createRolePermission(permission: Permission,rolePermissions: Permission[],roleId){
+
+		if(BasePermission.checkSuperUserPermission([permission]) && !BasePermission.checkSuperUserPermission(rolePermissions)) throw new CreateSuperUserRolePermission();
+
+		await this.roleService.createRolePermission(roleId,permission.id,this.handler);
+
+	}
+
+	async deleteRolePermission(permission: Permission,rolePermissions: Permission[],roleId){
+
+		if(BasePermission.checkSuperUserPermission([permission]) && !BasePermission.checkSuperUserPermission(rolePermissions)) throw new DeleteSuperUserRolePermission();
+
+		await this.roleService.deleteRolePermission(roleId,permission.id,this.handler);
+		return;
 	}
 }

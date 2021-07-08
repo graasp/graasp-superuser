@@ -87,4 +87,22 @@ export class RoleService {
         RETURNING ${RoleService.allColumns}
       `).then(({ rows }) => rows[0] || null);
 	}
+
+	async createRolePermission(roleId: string, permissionId: string, transactionHandler: TrxHandler): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		await transactionHandler.query(sql`
+        INSERT INTO role_permission (role,permission)
+        VALUES (${roleId},${permissionId})
+      `);
+	}
+
+	async deleteRolePermission(roleId: string, permissionId: string, transactionHandler: TrxHandler): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		await transactionHandler.query(sql`
+        DELETE FROM role_permission
+        WHERE role = ${roleId} AND permission = ${permissionId}
+      `);
+	}
 }
