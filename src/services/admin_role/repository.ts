@@ -11,10 +11,10 @@ export class AdminRoleRepository {
 		this.handler = handler;
 	}
 
-	async getMemberRole(memberId) {
-		const role = await this.adminRoleService.getMemberRole(memberId,this.handler);
-		if(!role) throw new MemberNotAdmin(memberId);
-		return role;
+	async getMemberRoles(memberId) {
+		const roles = await this.adminRoleService.getMemberRoles(memberId,this.handler);
+		if(!roles) throw new MemberNotAdmin(memberId);
+		return roles;
 	}
 
 }

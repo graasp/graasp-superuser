@@ -2,6 +2,7 @@ import {DatabaseTransactionHandler} from '../../plugins/db';
 import {PermissionService} from './db-service';
 import {DeleteSuperUserPermission, RequestNotAllowed} from '../../util/graasp-error';
 import {BasePermission} from './base-permission';
+import {AdminRole} from '../../interfaces/admin-role';
 
 export class PermissionRepository {
 	protected permissionService: PermissionService;
@@ -12,10 +13,9 @@ export class PermissionRepository {
 		this.handler = handler;
 	}
 
-	async checkPermissions(roleId,path,method) {
-		const permissions = await this.permissionService.getPermissions(roleId, this.handler);
+	async checkPermissions(roles,path,method) {
+		const permissions = await this.permissionService.getPermissions(roles, this.handler);
 
-		console.log(path,method);
 		const allowed =
 			permissions.filter(({endpoint, requestMethod}) => {
 
@@ -28,8 +28,8 @@ export class PermissionRepository {
 		return allowed;
 	}
 
-	async getOwnPermissions(roleId) {
-		const permissions = await this.permissionService.getPermissions(roleId,this.handler);
+	async getOwnPermissions(adminRoles: AdminRole[]) {
+		const permissions = await this.permissionService.getPermissions(adminRoles,this.handler);
 		return permissions.map((permission) => BasePermission.getReadableFormat(permission));
 	}
 
@@ -38,10 +38,10 @@ export class PermissionRepository {
 		return permissions.map((permission) => BasePermission.getReadableFormat(permission));
 	}
 
-	async getPermissionsByRole (roleId) {
-		const result = await this.permissionService.getPermissions(roleId,this.handler);
-
-		return result;
+	async getPermissionsByRole (roleId,readability = false) {
+		const permissions = await this.permissionService.getPermissionsByRoleId(roleId,this.handler);
+		const result = readability? permissions.map((permission) => BasePermission.getReadableFormat(permission)): permissions;
+		return  result;
 	}
 
 	async getPermission (id) {

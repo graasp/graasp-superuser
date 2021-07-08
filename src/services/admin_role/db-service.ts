@@ -28,7 +28,7 @@ export class AdminRoleService {
 		sql`, `
 	);
 
-	async getMemberRole(id: string, transactionHandler: TrxHandler): Promise<AdminRole> {
+	async getMemberRoles(id: string, transactionHandler: TrxHandler): Promise<AdminRole[]> {
 
 		return transactionHandler
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -38,6 +38,6 @@ export class AdminRoleService {
 				FROM member
 				JOIN admin_role ON admin_role.admin = member.id
 				WHERE member.id = ${id}
-			`).then(({rows}) => rows[0]);
+			`).then(({rows}) => rows.slice(0));
 	}
 }

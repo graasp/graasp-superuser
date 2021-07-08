@@ -40,8 +40,8 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		fastify.delete<{ Params: IdParam }>(
 			DELETE, { schema: deletePermission },
 			async ({  params: {id}, log }) => {
-				const permission = await permissionRepository.getPermissionsByRole(id);
-				const role = await roleRepository.deleteRole(id,permission);
+				const permissions = await permissionRepository.getPermissionsByRole(id);
+				const role = await roleRepository.deleteRole(id,permissions);
 				return role;
 			}
 		);
@@ -74,9 +74,9 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 
 		fastify.get(
 			GET ,
-			async ({memberRole: {role: id} }) => {
-				const role = await roleRepository.getCurrentRole(id);
-				return role;
+			async ({memberRoles }) => {
+				const roles = await roleRepository.getCurrentRoles(memberRoles);
+				return roles;
 			});
 	}, { prefix: ROUTES_PREFIX });
 };

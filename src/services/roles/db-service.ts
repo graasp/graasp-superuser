@@ -6,6 +6,7 @@ import {
 
 import {Role} from '../../interfaces/role';
 import {Permission} from '../../interfaces/permission';
+import {AdminRole} from '../../interfaces/admin-role';
 
 declare module 'fastify' {
 	interface FastifyInstance {
@@ -38,7 +39,8 @@ export class RoleService {
 			`).then(({rows}) => rows.slice(0));
 	}
 
-	async getRole(id: string, transactionHandler: TrxHandler): Promise<Role> {
+	async getRoles(adminRoles: AdminRole[], transactionHandler: TrxHandler): Promise<Role[]> {
+		const ids = adminRoles.map((adminRole) => adminRole.role);
 
 		return transactionHandler
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -46,8 +48,8 @@ export class RoleService {
 			.query<Role>(sql`
 				SELECT ${RoleService.allColumns} 
 				FROM role 
-				WHERE id = ${id}
-			`).then(({rows}) => rows[0]);
+				WHERE id IN (${sql.join(ids,sql `, `)})
+			`).then(({rows}) => rows.slice(0));
 	}
 
 	async getPermissions(role: Role, transactionHandler: TrxHandler): Promise<Role> {

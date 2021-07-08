@@ -9,6 +9,7 @@ import {
 import {BasePermission} from '../permissions/base-permission';
 import {BaseRole} from './base-role';
 import {Permission} from '../../interfaces/permission';
+import {AdminRole} from '../../interfaces/admin-role';
 
 export class RoleRepository {
 	protected roleService: RoleService;
@@ -19,9 +20,9 @@ export class RoleRepository {
 		this.handler = handler;
 	}
 
-	async getCurrentRole(roleId) {
-		const role = await this.roleService.getRole(roleId,this.handler);
-		return role;
+	async getCurrentRoles(adminRoles: AdminRole[]) {
+		const roles = await this.roleService.getRoles(adminRoles,this.handler);
+		return roles;
 	}
 
 	async getAllRoles() {
@@ -38,7 +39,6 @@ export class RoleRepository {
 	async deleteRole(id,permissions: Permission[]) {
 
 		if(BasePermission.checkSuperUserPermission(permissions)) throw new DeleteSuperUserRole(id);
-
 
 		const result = await this.roleService.delete(id,this.handler);
 		return result;

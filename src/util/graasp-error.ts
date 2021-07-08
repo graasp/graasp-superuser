@@ -108,8 +108,8 @@ export class MemberNotAdmin extends BaseGraaspError {
   }
 }
 export class RequestNotAllowed extends BaseGraaspError {
-  constructor(data?: unknown) {
-    super({ code: 'GSUERR016', statusCode: 403, message: 'Member is not allowed to perform this request' }, data);
+  constructor() {
+    super({ code: 'GSUERR016', statusCode: 403, message: 'Member is not allowed to perform this request' });
   }
 }
 

@@ -66,8 +66,9 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
     // TODO: do we really need to get the user from the DB? (or actor: { id } is enough?)
     // maybe when the groups are implemented it will be necessary.
     const member = await memberRepository.get(memberId);
-    const adminRole = await adminRoleRepository.getMemberRole(memberId);
+    const adminRole = await adminRoleRepository.getMemberRoles(memberId);
 
+    console.log(adminRole);
     if(!adminRole || !member) {
       reply.status(401);
       session.delete();
@@ -75,7 +76,7 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
     }
 
     request.member = member;
-    request.memberRole = adminRole;
+    request.memberRoles = adminRole;
   }
 
   async function fetchMemberInSession(request: FastifyRequest) {
@@ -146,9 +147,9 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
 
 
   async function verifyPermission(request: FastifyRequest, reply: FastifyReply){
-        const { memberRole: {role: roleId},routerMethod,url} = request;
-        const permission = await permissionRepository.checkPermissions(roleId,url,routerMethod);
-        if (permission.length === 0) throw new RequestNotAllowed(roleId);
+        const { memberRoles,routerMethod,url} = request;
+        const permission = await permissionRepository.checkPermissions(memberRoles,url,routerMethod);
+        if (permission.length === 0) throw new RequestNotAllowed();
   }
 
   fastify.decorate('verifyPermission',verifyPermission);
@@ -205,10 +206,8 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
         { schema: login },
         async ({ body, log }, reply) => {
           const members = await memberRepository.getMatching(body);
-          const adminRole = await adminRoleRepository.getMemberRole(members[0].id);
+          const adminRole = await adminRoleRepository.getMemberRoles(members[0].id);
 
-          if(!adminRole || !members) {
-          }
           if (members.length && adminRole) {
             const member = members[0];
             await generateLoginLinkAndEmailIt(member);

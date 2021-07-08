@@ -8,7 +8,7 @@ declare module 'fastify' {
   interface FastifyRequest {
     session: Session;
     member: Member;
-    memberRole: AdminRole
+    memberRoles: AdminRole[]
   }
 }
 

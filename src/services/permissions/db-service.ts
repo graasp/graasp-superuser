@@ -6,6 +6,8 @@ import {
 
 import {Permission} from '../../interfaces/permission';
 import {Item} from '../../interfaces/item';
+import {Role} from '../../interfaces/role';
+import {AdminRole} from '../../interfaces/admin-role';
 
 declare module 'fastify' {
 	interface FastifyInstance {
@@ -38,8 +40,8 @@ export class PermissionService {
 		sql`, `
 	);
 
-	async getPermissions(id: string, transactionHandler: TrxHandler): Promise<Permission[]> {
-
+	async getPermissions(adminRoles: AdminRole[], transactionHandler: TrxHandler): Promise<Permission[]> {
+		const ids = adminRoles.map((adminRole) => adminRole.role);
 		return transactionHandler
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
@@ -51,7 +53,25 @@ export class PermissionService {
 					JOIN role
 					ON role_permission.role = role.id
 					
-					WHERE role.id = ${id}
+					WHERE role.id IN (${sql.join(ids,sql `, `)})
+			`).then(({rows}) => rows.slice(0));
+	}
+
+
+	async getPermissionsByRoleId(roleId: string, transactionHandler: TrxHandler): Promise<Permission[]> {
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Permission>(sql`
+					SELECT ${PermissionService.allColumnsForJoins}
+					FROM permission
+					INNER JOIN role_permission
+					ON permission.id = role_permission.permission
+					JOIN role
+					ON role_permission.role = role.id
+					
+					WHERE role.id = ${roleId}
 			`).then(({rows}) => rows.slice(0));
 	}
 

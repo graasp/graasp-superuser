@@ -27,10 +27,8 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		fastify.get<{ Querystring: RoleParam}>(
 			GET, {schema: getPermissions}, async ({query: {roleId}} ) => {
 
-				console.log(roleId);
-
 				if(roleId){
-					const permissions = await repository.getPermissionsByRole(roleId);
+					const permissions = await repository.getPermissionsByRole(roleId,true);
 					return permissions;
 				}
 				else{
@@ -64,9 +62,9 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 
 		fastify.get(
 			GET_OWN ,
-			async ({memberRole: {role: id} }) => {
-				const role = await repository.getOwnPermissions(id);
-				return role;
+			async ({memberRoles }) => {
+				const permissions = await repository.getOwnPermissions(memberRoles);
+				return permissions;
 			});
 	}, { prefix: ROUTES_PREFIX });
 };

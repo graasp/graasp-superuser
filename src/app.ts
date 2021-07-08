@@ -28,7 +28,7 @@ const decorateFastifyInstance: FastifyPluginAsync = async (fastify) => {
 	fastify.decorate('items', { dbService: new ItemService() });
 	fastify.decorate('role', { dbService: new RoleService() });
 	fastify.decorateRequest('member', null);
-	fastify.decorateRequest('memberRole', null);
+	fastify.decorateRequest('memberRoles', null);
 	fastify.decorateRequest('permission', null);
 };
 
