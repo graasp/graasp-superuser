@@ -29,6 +29,12 @@ export class RoleRepository {
 		const roles = await this.roleService.getRolesByMemberId(memberId,this.handler);
 		return roles;
 	}
+
+	async get(roleId) {
+		const role = await this.roleService.get(roleId,this.handler);
+		return role;
+	}
+
 	async getAllRoles() {
 		const role = await this.roleService.getAllRoles(this.handler);
 		return role;

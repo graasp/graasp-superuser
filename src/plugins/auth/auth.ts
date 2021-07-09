@@ -25,10 +25,9 @@ import {
 import { Member } from '../../interfaces/member';
 
 // local
-import { register, login, auth } from './schemas';
+import {  login, auth } from './schemas';
 import { AuthPluginOptions } from './interfaces/auth';
 import {MemberRepository} from '../../services/members/repository';
-import {GET_ALL, ROUTES_PREFIX} from '../../services/members/routes';
 import {PermissionRepository} from '../../services/permissions/repository';
 import {RequestNotAllowed} from '../../util/graasp-error';
 import {RoleRepository} from '../../services/roles/repository';

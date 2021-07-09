@@ -43,8 +43,6 @@ export const getPermissions = {
 	}
 };
 
-
-
 export const getOne = {
 	params: idParam,
 	response: { 200: permission, '4xx': error }

@@ -51,7 +51,7 @@ export class PermissionRepository {
 		return  result;
 	}
 
-	async getPermission (id) {
+	async get(id) {
 		const result = await this.permissionService.get(id,this.handler);
 		return result;
 	}

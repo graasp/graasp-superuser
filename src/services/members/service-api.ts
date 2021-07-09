@@ -1,12 +1,10 @@
 import {FastifyPluginAsync} from 'fastify';
 import common, {getOne} from './schemas';
 import {MemberRepository} from './repository';
-import {IdParam, PermissionIdParam, RoleIdParam} from '../../interfaces/requests';
+import {IdParam, RoleIdParam} from '../../interfaces/requests';
 import {GET, GET_ADMINS, GET_ALL, GET_PERMISSIONS, GET_ROLE, POST_MEMBER_ROLE, ROUTES_PREFIX} from './routes';
 import {PermissionRepository} from '../permissions/repository';
 import {RoleRepository} from '../roles/repository';
-import {POST_ROLE_PERMISSION} from '../roles/routes';
-import {createRolePermission} from '../roles/fluent-schema';
 import {createMemberRole} from './fluent-schema';
 
 const plugin: FastifyPluginAsync = async (fastify) => {
@@ -62,7 +60,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		);
 
 		// fastify.post<{ Params: IdParam, Body: RoleIdParam }>(
-		// 	POST_ROLE_PERMISSION, { schema: createMemberRole  },
+		// 	POST_MEMBER_ROLE, { schema: createMemberRole  },
 		// 	async ({superUser, params: {id}, body, log },reply) => {
 		// 		const { roleId } = body;
 		// 		const role = await roleRepository.get(permissionId);

@@ -15,6 +15,19 @@ export const createRole = {
 	}
 };
 
+export const deleteRole = {
+	params: { $ref: 'http://graasp.org/#/definitions/idParam' },
+	response: {
+		200: role,
+		'4xx': error
+	}
+};
+export const getOne = {
+	params: idParam,
+	response: { 200: role, '4xx': error }
+};
+
+
 export const createRolePermission = {
 	params: { $ref: 'http://graasp.org/#/definitions/idParam' },
 	body: S.object().additionalProperties(false)

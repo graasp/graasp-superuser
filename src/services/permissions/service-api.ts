@@ -19,7 +19,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		fastify.get<{ Params: IdParam }>(
 			GET_BY_ID, { schema: getOne },
 			async ({  params: {id}, log }) => {
-				const permission = await repository.getPermission(id);
+				const permission = await repository.get(id);
 				return permission;
 			}
 		);

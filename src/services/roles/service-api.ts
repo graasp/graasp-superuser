@@ -8,12 +8,11 @@ import {
 	POST_ROLE_PERMISSION,
 	POST,
 	DELETE_ROLE_PERMISSION,
-	GET_OWN
+	GET_OWN, GET_BY_ID
 } from './routes';
-import {IdParam, PermissionBody, PermissionIdParam} from '../../interfaces/requests';
-import {createPermission, deletePermission} from '../permissions/fluent-schema';
+import {IdParam, PermissionIdParam} from '../../interfaces/requests';
 import {Role} from '../../interfaces/role';
-import {createRole, createRolePermission, deleteRolePermission} from './fluent-schema';
+import {createRole, createRolePermission, deleteRole, deleteRolePermission,getOne} from './fluent-schema';
 import {PermissionRepository} from '../permissions/repository';
 
 const plugin: FastifyPluginAsync = async (fastify) => {
@@ -36,6 +35,13 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 				return allMembers;
 			});
 
+		fastify.get<{ Params: IdParam }>(
+			GET_BY_ID, { schema: getOne },
+			async ({  params: {id}, log }) => {
+				const role = await roleRepository.get(id);
+				return role;
+			}
+		);
 
 		fastify.post<{ Body: Role }>(
 			POST, { schema: createRole },
@@ -46,7 +52,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		);
 
 		fastify.delete<{ Params: IdParam }>(
-			DELETE, { schema: deletePermission },
+			DELETE, { schema: deleteRole },
 			async ({  params: {id}, log }) => {
 				const permissions = await permissionRepository.getPermissionsByRole(id);
 				const role = await roleRepository.deleteRole(id,permissions);
@@ -58,7 +64,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			POST_ROLE_PERMISSION, { schema: createRolePermission  },
 			async ({superUser, params: {id}, body, log },reply) => {
 				const { permissionId } = body;
-				const permission = await permissionRepository.getPermission(permissionId);
+				const permission = await permissionRepository.get(permissionId);
 				const rolePermissions = await permissionRepository.getPermissionsByRole(id);
 				await roleRepository.createRolePermission(superUser,permission,rolePermissions,id);
 				reply.status(204);			}
@@ -68,7 +74,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			DELETE_ROLE_PERMISSION, { schema: deleteRolePermission  },
 			async ({superUser, params: {id}, body, log },reply) => {
 				const { permissionId } = body;
-				const permission = await permissionRepository.getPermission(permissionId);
+				const permission = await permissionRepository.get(permissionId);
 				const rolePermissions = await permissionRepository.getPermissionsByRole(id);
 				await roleRepository.deleteRolePermission(superUser,permission,rolePermissions,id);
 				reply.status(204);

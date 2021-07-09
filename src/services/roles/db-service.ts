@@ -37,6 +37,18 @@ export class RoleService {
 		sql`, `
 	);
 
+	async get(roleId: string, transactionHandler: TrxHandler): Promise<Role> {
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Role>(sql`
+				SELECT ${RoleService.allColumns}
+				FROM role
+				WHERE id = ${roleId}
+			`).then(({rows}) => rows[0]);
+	}
+
 	async getAllRoles(transactionHandler: TrxHandler): Promise<Role[]> {
 
 		return transactionHandler
