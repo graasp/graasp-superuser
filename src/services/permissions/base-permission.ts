@@ -43,8 +43,8 @@ export class BasePermission implements Permission {
 		return readableFormat;
 	}
 
-	static checkSuperUserPermission = (permissions: Permission[]) => {
-		return permissions.find((permission) => permission.requestMethod === ALL_SYMBOL && permission.endpoint === ALL_SYMBOL);
+	static checkSuperUserPermission = (permission: Permission) => {
+		return (permission.requestMethod === ALL_SYMBOL && permission.endpoint === ALL_SYMBOL);
 	}
 
 }

@@ -4,12 +4,13 @@ import {
 	CreateSuperUserRolePermission,
 	DeleteSuperUserPermission,
 	DeleteSuperUserRole,
-	MemberNotAdmin, SUPermissionNotAssignable, SUPermissionNotRemovable,
+	MemberNotAdmin, SUPermissionNotAssignable, SUPermissionNotRemovable, SURoleDelete,
 } from '../../util/graasp-error';
 import {BasePermission} from '../permissions/base-permission';
 import {BaseRole} from './base-role';
 import {Permission} from '../../interfaces/permission';
 import {AdminRole} from '../../interfaces/admin-role';
+import {SUPER_USER_ROLE_UUID} from '../../util/config';
 
 export class RoleRepository {
 	protected roleService: RoleService;
@@ -46,25 +47,23 @@ export class RoleRepository {
 		return result;
 	}
 
-	async deleteRole(id,permissions: Permission[]) {
-
-		if(BasePermission.checkSuperUserPermission(permissions)) throw new DeleteSuperUserRole(id);
-
+	async deleteRole(id) {
+		if(id === SUPER_USER_ROLE_UUID) throw new SURoleDelete();
 		const result = await this.roleService.delete(id,this.handler);
 		return result;
 	}
 
-	async createRolePermission(superUser,permission: Permission,rolePermissions: Permission[],roleId){
+	async createRolePermission(permission: Permission,roleId){
 
-		if(BasePermission.checkSuperUserPermission([permission])) throw new SUPermissionNotAssignable();
+		if(BasePermission.checkSuperUserPermission(permission)) throw new SUPermissionNotAssignable();
 
 		await this.roleService.createRolePermission(roleId,permission.id,this.handler);
 
 	}
 
-	async deleteRolePermission(superUser,permission: Permission,rolePermissions: Permission[],roleId){
+	async deleteRolePermission(permission: Permission,roleId){
 
-		if(BasePermission.checkSuperUserPermission([permission]) && !BasePermission.checkSuperUserPermission(rolePermissions)) throw new SUPermissionNotRemovable();
+		if(BasePermission.checkSuperUserPermission(permission)) throw new SUPermissionNotRemovable();
 
 		await this.roleService.deleteRolePermission(roleId,permission.id,this.handler);
 		return;

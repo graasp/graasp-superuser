@@ -2,10 +2,19 @@ import {FastifyPluginAsync} from 'fastify';
 import common, {getOne} from './schemas';
 import {MemberRepository} from './repository';
 import {IdParam, RoleIdParam} from '../../interfaces/requests';
-import {GET, GET_ADMINS, GET_ALL, GET_PERMISSIONS, GET_ROLE, POST_MEMBER_ROLE, ROUTES_PREFIX} from './routes';
+import {
+	DELETE_MEMBER_ROLE,
+	GET,
+	GET_ADMINS,
+	GET_ALL,
+	GET_PERMISSIONS,
+	GET_ROLE,
+	POST_MEMBER_ROLE,
+	ROUTES_PREFIX
+} from './routes';
 import {PermissionRepository} from '../permissions/repository';
 import {RoleRepository} from '../roles/repository';
-import {createMemberRole} from './fluent-schema';
+import {createMemberRole, deleteMemberRole} from './fluent-schema';
 
 const plugin: FastifyPluginAsync = async (fastify) => {
 	const {
@@ -59,16 +68,21 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			}
 		);
 
-		// fastify.post<{ Params: IdParam, Body: RoleIdParam }>(
-		// 	POST_MEMBER_ROLE, { schema: createMemberRole  },
-		// 	async ({superUser, params: {id}, body, log },reply) => {
-		// 		const { roleId } = body;
-		// 		const role = await roleRepository.get(permissionId);
-		// 		const rolePermissions = await permissionRepository.getPermissionsByRole(id);
-		// 		await roleRepository.createRolePermission(superUser,permission,rolePermissions,id);
-		// 		reply.status(204);			}
-		// );
+		fastify.post<{ Params: IdParam, Body: RoleIdParam }>(
+			POST_MEMBER_ROLE, { schema: createMemberRole  },
+			async ({superUser, params: {id}, body, log },reply) => {
+				const { roleId } = body;
+				await memberRepository.createMemberRole(superUser,roleId,id);
+				reply.status(204);			}
+		);
 
+		fastify.delete<{ Params: IdParam, Body: RoleIdParam }>(
+			DELETE_MEMBER_ROLE, { schema: deleteMemberRole  },
+			async ({params: {id}, body, log },reply) => {
+				const { roleId } = body;
+				await memberRepository.deleteRolePermission(roleId,id);
+				reply.status(204);			}
+		);
 	}, { prefix: ROUTES_PREFIX });
 };
 

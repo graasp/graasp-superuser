@@ -136,7 +136,7 @@ export class MemberService {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		await transactionHandler.query(sql`
-        DELETE FROM role_permission
+        DELETE FROM admin_role
         WHERE admin = ${memberId} AND role = ${roleId}
       `);
 	}

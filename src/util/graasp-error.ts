@@ -143,6 +143,24 @@ export class SUPermissionNotRemovable extends BaseGraaspError {
   }
 }
 
+export class SURoleDelete extends BaseGraaspError {
+  constructor() {
+    super({ code: 'GSUERR020', statusCode: 403, message: 'SuperUser role cannot be deleted' });
+  }
+}
+
+export class SURoleNotAssignable extends BaseGraaspError {
+  constructor() {
+    super({ code: 'GSUERR020', statusCode: 403, message: 'Only SuperUser can assign SuperUser Privilege' });
+  }
+}
+
+export class SURoleNotRemovable extends BaseGraaspError {
+  constructor() {
+    super({ code: 'GSUERR020', statusCode: 403, message: 'SuperUser privilege cannot be removed' });
+  }
+}
+
 export class DatabaseError extends BaseGraaspError {
   constructor(data?: unknown) {
     super({ code: 'GSUERR998', statusCode: 500, message: 'Database error' }, data);

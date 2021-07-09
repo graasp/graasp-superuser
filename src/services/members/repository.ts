@@ -1,7 +1,16 @@
 import { DatabaseTransactionHandler } from '../../plugins/db';
 import {UnknownExtra} from '../../interfaces/extra';
 import {MemberService} from './db-service';
-import {MemberNotFound} from '../../util/graasp-error';
+import {
+	MemberNotFound,
+	SUPermissionNotAssignable,
+	SUPermissionNotRemovable,
+	SURoleNotAssignable, SURoleNotRemovable
+} from '../../util/graasp-error';
+import {Permission} from '../../interfaces/permission';
+import {BasePermission} from '../permissions/base-permission';
+import {Role} from '../../interfaces/role';
+import {SUPER_USER_ROLE_UUID} from '../../util/config';
 
 export class MemberRepository<E extends UnknownExtra>  {
 	protected memberService: MemberService;
@@ -32,5 +41,21 @@ export class MemberRepository<E extends UnknownExtra>  {
 	async getAdmins() {
 		const admins = await this.memberService.getAdmins(this.handler);
 		return admins;
+	}
+
+	async createMemberRole(superUser,roleId,memberId){
+
+		if(!superUser && roleId === SUPER_USER_ROLE_UUID ) throw new SURoleNotAssignable();
+
+		await this.memberService.createMemberRole(memberId,roleId,this.handler);
+
+	}
+
+	async deleteRolePermission(roleId,memberId){
+
+		if(roleId === SUPER_USER_ROLE_UUID ) throw new SURoleNotRemovable();
+
+		await this.memberService.deleteMemberRole(memberId,roleId,this.handler);
+		return;
 	}
 }

@@ -18,7 +18,7 @@ import {
     REFRESH_TOKEN_JWT_SECRET,
     REFRESH_TOKEN_EXPIRATION_IN_MINUTES,
     LOGIN_TOKEN_EXPIRATION_IN_MINUTES,
-    JWT_SECRET, EMAIL_LINKS_HOST, PROTOCOL, CLIENT_HOST, SUPER_USER_UUID
+    JWT_SECRET, EMAIL_LINKS_HOST, PROTOCOL, CLIENT_HOST, SUPER_USER_ROLE_UUID
 } from '../../util/config';
 
 // other services
@@ -75,7 +75,7 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
 
     request.member = member;
     request.memberRoles = adminRole;
-    request.superUser = Boolean(adminRole.find((role) => role.id === SUPER_USER_UUID));
+    request.superUser = Boolean(adminRole.find((role) => role.id === SUPER_USER_ROLE_UUID));
   }
 
   async function fetchMemberInSession(request: FastifyRequest) {

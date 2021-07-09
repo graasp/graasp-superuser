@@ -172,4 +172,4 @@ export const LEVEL = {
 
 export const ALL_SYMBOL = '.*';
 
-export const SUPER_USER_UUID = process.env.SUPER_USER_UUID;
+export const SUPER_USER_ROLE_UUID = process.env.SUPER_USER_ROLE_UUID;

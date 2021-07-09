@@ -66,7 +66,7 @@ export class PermissionRepository {
 	async deletePermission(id) {
 		const permission = await this.permissionService.get(id,this.handler);
 
-		if(BasePermission.checkSuperUserPermission([permission])) throw new DeleteSuperUserPermission(id);
+		if(BasePermission.checkSuperUserPermission(permission)) throw new DeleteSuperUserPermission(id);
 
 		const result = await this.permissionService.delete(id,this.handler);
 		return result;
