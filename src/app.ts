@@ -14,15 +14,12 @@ import {MemberService} from './services/members/db-service';
 import MemberServiceAPI from './services/members/service-api';
 import {ItemService} from './services/items/db-service';
 import ItemServiceAPI from './services/items/service-api';
-import {AdminRoleService} from './services/admin_role/db-service';
-import AdminRoleServiceAPI from './services/admin_role/service-api';
 import {PermissionService} from './services/permissions/db-service';
 import PermissionServiceAPI from './services/permissions/service-api';
 import {RoleService} from './services/roles/db-service';
 import RoleServiceAPI from './services/roles/service-api';
 
 const decorateFastifyInstance: FastifyPluginAsync = async (fastify) => {
-	fastify.decorate('adminRole', { dbService: new AdminRoleService() });
 	fastify.decorate('permissions', { dbService: new PermissionService() });
 	fastify.decorate('members', { dbService: new MemberService() });
 	fastify.decorate('items', { dbService: new ItemService() });
@@ -52,7 +49,6 @@ instance
 instance.register(async (instance) =>{
 	instance.register(fp(MemberServiceAPI));
 	instance.register(fp(ItemServiceAPI));
-	instance.register(fp(AdminRoleServiceAPI));
 	instance.register(fp(PermissionServiceAPI));
 	instance.register(fp(RoleServiceAPI));
 });

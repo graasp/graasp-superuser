@@ -4,7 +4,6 @@ import {MemberRepository} from './repository';
 import {IdParam, PermissionIdParam, RoleIdParam} from '../../interfaces/requests';
 import {GET, GET_ADMINS, GET_ALL, GET_PERMISSIONS, GET_ROLE, POST_MEMBER_ROLE, ROUTES_PREFIX} from './routes';
 import {PermissionRepository} from '../permissions/repository';
-import {AdminRoleRepository} from '../admin_role/repository';
 import {RoleRepository} from '../roles/repository';
 import {POST_ROLE_PERMISSION} from '../roles/routes';
 import {createRolePermission} from '../roles/fluent-schema';
@@ -14,7 +13,6 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 	const {
 		members: {dbService: dbServiceM},
 		permissions: {dbService: dbServiceP},
-		adminRole: { dbService: dbServiceAR},
 		role: { dbService: dbServiceR},
 		db
 	} = fastify;
