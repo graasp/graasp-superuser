@@ -19,6 +19,9 @@ export class BasePermission implements Permission {
 		this.requestMethod = this.validateRequestMethod(requestMethod);
 	}
 
+	private endpointToRegex = (endpoint) => {
+		return endpoint.replace();
+	}
 	private validateRequestMethod = (requestMethod) => {
 		return requestMethod === METHODS.ALL ? ALL_SYMBOL : requestMethod;
 	}
@@ -43,4 +46,5 @@ export class BasePermission implements Permission {
 	static checkSuperUserPermission = (permissions: Permission[]) => {
 		return permissions.find((permission) => permission.requestMethod === ALL_SYMBOL && permission.endpoint === ALL_SYMBOL);
 	}
+
 }

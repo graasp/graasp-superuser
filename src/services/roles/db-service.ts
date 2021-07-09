@@ -29,6 +29,14 @@ export class RoleService {
 		sql`, `
 	);
 
+	private static allColumnsForJoins = sql.join(
+		[
+			[['role', 'id'], ['id']],
+			[['role', 'description'], ['description']],
+		].map(c => sql.join(c.map(cwa => sql.identifier(cwa)), sql` AS `)),
+		sql`, `
+	);
+
 	async getAllRoles(transactionHandler: TrxHandler): Promise<Role[]> {
 
 		return transactionHandler
@@ -50,20 +58,6 @@ export class RoleService {
 				FROM role 
 				WHERE id IN (${sql.join(ids,sql `, `)})
 			`).then(({rows}) => rows.slice(0));
-	}
-
-	async getPermissions(role: Role, transactionHandler: TrxHandler): Promise<Role> {
-		const { description } = role;
-
-		return transactionHandler
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			.query<Role>(sql`
-        INSERT INTO role (description)
-        VALUES (${description})
-        RETURNING ${RoleService.allColumns}
-      `)
-			.then(({ rows }) => rows[0]);
 	}
 
 	async create(role: Role, transactionHandler: TrxHandler): Promise<Role> {
@@ -106,5 +100,16 @@ export class RoleService {
         DELETE FROM role_permission
         WHERE role = ${roleId} AND permission = ${permissionId}
       `);
+	}
+
+	async getRolesByMemberId (memberId: string, transactionHandler: TrxHandler): Promise<Role[]> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		return transactionHandler.query<Role>(sql`
+			SELECT ${RoleService.allColumnsForJoins} FROM role
+			JOIN admin_role ar on role.id = ar.role
+			JOIN member m on m.id = ar.admin
+			WHERE m.id = ${memberId}
+		`).then(({rows}) => rows.slice(0));
 	}
 }

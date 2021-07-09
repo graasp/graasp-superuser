@@ -12,13 +12,13 @@ import fastifySecureSession from 'fastify-secure-session';
 import fastifyBearerAuth from 'fastify-bearer-auth';
 
 import {
-  AUTH_TOKEN_JWT_SECRET,
-  AUTH_TOKEN_EXPIRATION_IN_MINUTES,
-  TOKEN_BASED_AUTH,
-  REFRESH_TOKEN_JWT_SECRET,
-  REFRESH_TOKEN_EXPIRATION_IN_MINUTES,
-  LOGIN_TOKEN_EXPIRATION_IN_MINUTES,
-  JWT_SECRET, EMAIL_LINKS_HOST, PROTOCOL, CLIENT_HOST
+    AUTH_TOKEN_JWT_SECRET,
+    AUTH_TOKEN_EXPIRATION_IN_MINUTES,
+    TOKEN_BASED_AUTH,
+    REFRESH_TOKEN_JWT_SECRET,
+    REFRESH_TOKEN_EXPIRATION_IN_MINUTES,
+    LOGIN_TOKEN_EXPIRATION_IN_MINUTES,
+    JWT_SECRET, EMAIL_LINKS_HOST, PROTOCOL, CLIENT_HOST, SUPER_USER_UUID
 } from '../../util/config';
 
 // other services
@@ -32,6 +32,7 @@ import {AdminRoleRepository} from '../../services/admin_role/repository';
 import {GET_ALL, ROUTES_PREFIX} from '../../services/members/routes';
 import {PermissionRepository} from '../../services/permissions/repository';
 import {RequestNotAllowed} from '../../util/graasp-error';
+import {RoleRepository} from '../../services/roles/repository';
 
 const promisifiedJwtVerify = promisify<string, Secret, VerifyOptions, { sub: string }>(jwt.verify);
 const promisifiedJwtSign = promisify<{ sub: string }, Secret, SignOptions, string>(jwt.sign);
@@ -41,10 +42,10 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
     sessionCookieDomain: domain,
     uniqueViolationErrorName = 'UniqueIntegrityConstraintViolationError' // TODO: can we improve this?
   } = options;
-  const { log, db, members: { dbService: mS }, adminRole: { dbService: rS}, permissions: { dbService: pS} } = fastify;
+  const { log, db, members: { dbService: mS }, permissions: { dbService: pS}, role: { dbService: rS} } = fastify;
   const  memberRepository = new MemberRepository(mS,db.pool);
-  const adminRoleRepository = new AdminRoleRepository(rS,db.pool);
   const permissionRepository = new PermissionRepository(pS,db.pool);
+  const roleRepository = new RoleRepository(rS,db.pool);
 
   // cookie based auth
   fastify.register(fastifySecureSession, {
@@ -66,9 +67,8 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
     // TODO: do we really need to get the user from the DB? (or actor: { id } is enough?)
     // maybe when the groups are implemented it will be necessary.
     const member = await memberRepository.get(memberId);
-    const adminRole = await adminRoleRepository.getMemberRoles(memberId);
+    const adminRole = await roleRepository.getMemberRole(memberId);
 
-    console.log(adminRole);
     if(!adminRole || !member) {
       reply.status(401);
       session.delete();
@@ -77,6 +77,7 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
 
     request.member = member;
     request.memberRoles = adminRole;
+    request.superUser = Boolean(adminRole.find((role) => role.id === SUPER_USER_UUID));
   }
 
   async function fetchMemberInSession(request: FastifyRequest) {
@@ -206,7 +207,7 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
         { schema: login },
         async ({ body, log }, reply) => {
           const members = await memberRepository.getMatching(body);
-          const adminRole = await adminRoleRepository.getMemberRoles(members[0].id);
+          const adminRole = await roleRepository.getMemberRole(members[0].id);
 
           if (members.length && adminRole) {
             const member = members[0];

@@ -1,53 +1,42 @@
-create table if not exists permission
+CREATE TABLE IF NOT EXISTS "permission"
 (
-    id uuid default uuid_generate_v4() not null,
-    endpoint varchar(500) not null,
-    request_method varchar(6) not null,
-    description varchar(5000) not null,
-    constraint permission_pkey
-        primary key (id),
-    constraint endpoint_method
-        unique (endpoint, request_method)
+    "id" uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    "endpoint" VARCHAR(500) NOT NULL,
+    "request_method" VARCHAR(6) NOT NULL,
+    "description" VARCHAR(5000) NOT NULL,
+    CONSTRAINT "endpoint_method"
+        UNIQUE ("endpoint", "request_method")
 );
 
-create table if not exists role
+CREATE TABLE IF NOT EXISTS "role"
 (
-    id uuid default uuid_generate_v4() not null,
-    description varchar(100) not null,
-    constraint role_pkey
-        primary key (id),
-    constraint description_key
-        unique (description)
+    "id" uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    "description" VARCHAR(100) UNIQUE NOT NULL
 );
 
-create table if not exists role_permission
+CREATE TABLE IF NOT EXISTS "role_permission"
 (
-    id uuid default uuid_generate_v4() not null,
-    role uuid,
-    permission uuid,
-    constraint role_permission_pkey
-        primary key (id),
-    constraint role_permission_key
-        unique (role, permission),
-    constraint role_permision_role_fkey
-        foreign key (role) references role
-            on delete cascade,
-    constraint role_permision_permission_fkey
-        foreign key (permission) references permission
-            on delete cascade
+    "id" uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    "role" uuid REFERENCES "role" ("id") ON DELETE CASCADE,
+    "permission" uuid REFERENCES "permission" ("id") ON DELETE CASCADE,
+     CONSTRAINT "role_permission_unique_key"
+            UNIQUE ("role_id", "permission")
 );
 
-create table if not exists admin_role
+CREATE TABLE IF NOT EXISTS "admin_role"
 (
-    id uuid default uuid_generate_v4() not null,
-    admin uuid not null,
-    role uuid not null,
-    constraint admin_role_pkey
-        primary key (id),
-    constraint admin_role_unique_key
-        unique (admin, role),
-    constraint admin_role_role_fkey
-        foreign key (role) references role,
-    constraint admin_role_admin_fkey
-        foreign key (admin) references member
-);4
+    "id" uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    "admin" uuid REFERENCES "member" ("id") ON DELETE CASCADE,
+    "role" uuid REFERENCES "role" ("id") ON DELETE CASCADE,
+    CONSTRAINT "admin_role_unique_key"
+        unique (admin, role)
+);
+
+INSERT INTO role (id,description)
+VALUES ('4f43341f-a5a9-4b1e-a104-fc0f9a3e985f','SuperUser');
+
+INSERT INTO permission (id,endpoint,request_method,description)
+VALUES ('60e64678-beeb-4763-908f-050ac663eba7','.*','.*','SuperUser Rights');
+
+INSERT INTO role_permission (role,permission)
+VALUES ('4f43341f-a5a9-4b1e-a104-fc0f9a3e985f','60e64678-beeb-4763-908f-050ac663eba7');

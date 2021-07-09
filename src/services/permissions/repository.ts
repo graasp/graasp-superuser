@@ -3,6 +3,7 @@ import {PermissionService} from './db-service';
 import {DeleteSuperUserPermission, RequestNotAllowed} from '../../util/graasp-error';
 import {BasePermission} from './base-permission';
 import {AdminRole} from '../../interfaces/admin-role';
+import {Role} from '../../interfaces/role';
 
 export class PermissionRepository {
 	protected permissionService: PermissionService;
@@ -28,8 +29,8 @@ export class PermissionRepository {
 		return allowed;
 	}
 
-	async getOwnPermissions(adminRoles: AdminRole[]) {
-		const permissions = await this.permissionService.getPermissions(adminRoles,this.handler);
+	async getOwnPermissions(roles: Role[]) {
+		const permissions = await this.permissionService.getPermissions(roles,this.handler);
 		return permissions.map((permission) => BasePermission.getReadableFormat(permission));
 	}
 
@@ -44,6 +45,12 @@ export class PermissionRepository {
 		return  result;
 	}
 
+	async getPermissionsByMember (memberId,readability = false) {
+		const permissions = await this.permissionService.getPermissionsByMemberId(memberId,this.handler);
+		const result = readability? permissions.map((permission) => BasePermission.getReadableFormat(permission)): permissions;
+		return  result;
+	}
+
 	async getPermission (id) {
 		const result = await this.permissionService.get(id,this.handler);
 		return result;
@@ -51,6 +58,7 @@ export class PermissionRepository {
 
 	async createPermission({endpoint,method,description}) {
 		const permission = new BasePermission(description,endpoint,method);
+
 		const result = await this.permissionService.create(permission,this.handler);
 		return result;
 	}

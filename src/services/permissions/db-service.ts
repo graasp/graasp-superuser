@@ -40,8 +40,8 @@ export class PermissionService {
 		sql`, `
 	);
 
-	async getPermissions(adminRoles: AdminRole[], transactionHandler: TrxHandler): Promise<Permission[]> {
-		const ids = adminRoles.map((adminRole) => adminRole.role);
+	async getPermissions(roles: Role[], transactionHandler: TrxHandler): Promise<Permission[]> {
+		const ids = roles.map((role) => role.id);
 		return transactionHandler
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
@@ -72,6 +72,22 @@ export class PermissionService {
 					ON role_permission.role = role.id
 					
 					WHERE role.id = ${roleId}
+			`).then(({rows}) => rows.slice(0));
+	}
+
+	async getPermissionsByMemberId(memberId: string, transactionHandler: TrxHandler): Promise<Permission[]> {
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Permission>(sql`
+					SELECT ${PermissionService.allColumnsForJoins}
+					FROM permission
+					JOIN role_permission rp on permission.id = rp.permission
+					JOIN role r on r.id = rp.role
+					JOIN admin_role ar on r.id = ar.role
+					JOIN member m on m.id = ar.admin
+					WHERE m.id = ${memberId}
 			`).then(({rows}) => rows.slice(0));
 	}
 

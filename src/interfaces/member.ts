@@ -3,12 +3,14 @@ import { Session } from 'fastify-secure-session';
 import { Actor } from '../interfaces/actor';
 import { UnknownExtra } from '../interfaces/extra';
 import {AdminRole} from './admin-role';
+import {Role} from './role';
 
 declare module 'fastify' {
   interface FastifyRequest {
     session: Session;
     member: Member;
-    memberRoles: AdminRole[]
+    memberRoles: Role[];
+    superUser: boolean;
   }
 }
 

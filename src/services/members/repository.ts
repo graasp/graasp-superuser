@@ -12,6 +12,13 @@ export class MemberRepository<E extends UnknownExtra>  {
 		this.handler = handler;
 	}
 
+	async get(memberId) {
+		const member = await this.memberService.get<E>(memberId,this.handler);
+		if(!member) throw new MemberNotFound(memberId);
+		return member;
+	}
+
+
 	async getAllMembers() {
 		const allMembers = await this.memberService.getAllMembers(this.handler);
 		return allMembers;
@@ -22,10 +29,8 @@ export class MemberRepository<E extends UnknownExtra>  {
 		return members;
 	}
 
-	async get(memberId) {
-		const member = await this.memberService.get<E>(memberId,this.handler);
-		if(!member) throw new MemberNotFound(memberId);
-		return member;
+	async getAdmins() {
+		const admins = await this.memberService.getAdmins(this.handler);
+		return admins;
 	}
-
 }

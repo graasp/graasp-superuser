@@ -1,7 +1,15 @@
 import { FastifyPluginAsync } from 'fastify';
 import common from './schemas';
 import {RoleRepository} from './repository';
-import {ROUTES_PREFIX, GET, GET_ALL, DELETE, POST_ROLE_PERMISSION, POST, DELETE_ROLE_PERMISSION} from './routes';
+import {
+	ROUTES_PREFIX,
+	GET_ALL,
+	DELETE,
+	POST_ROLE_PERMISSION,
+	POST,
+	DELETE_ROLE_PERMISSION,
+	GET_OWN
+} from './routes';
 import {IdParam, PermissionBody, PermissionIdParam} from '../../interfaces/requests';
 import {createPermission, deletePermission} from '../permissions/fluent-schema';
 import {Role} from '../../interfaces/role';
@@ -48,21 +56,21 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 
 		fastify.post<{ Params: IdParam, Body: PermissionIdParam }>(
 			POST_ROLE_PERMISSION, { schema: createRolePermission  },
-			async ({ params: {id}, body, log },reply) => {
+			async ({superUser, params: {id}, body, log },reply) => {
 				const { permissionId } = body;
 				const permission = await permissionRepository.getPermission(permissionId);
 				const rolePermissions = await permissionRepository.getPermissionsByRole(id);
-				await roleRepository.createRolePermission(permission,rolePermissions,id);
+				await roleRepository.createRolePermission(superUser,permission,rolePermissions,id);
 				reply.status(204);			}
 		);
 
 		fastify.delete<{ Params: IdParam, Body: PermissionIdParam }>(
 			DELETE_ROLE_PERMISSION, { schema: deleteRolePermission  },
-			async ({ params: {id}, body, log },reply) => {
+			async ({superUser, params: {id}, body, log },reply) => {
 				const { permissionId } = body;
 				const permission = await permissionRepository.getPermission(permissionId);
 				const rolePermissions = await permissionRepository.getPermissionsByRole(id);
-				await roleRepository.deleteRolePermission(permission,rolePermissions,id);
+				await roleRepository.deleteRolePermission(superUser,permission,rolePermissions,id);
 				reply.status(204);
 			}
 		);
@@ -73,10 +81,9 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		fastify.addHook('preHandler', fastify.verifyAuthentication);
 
 		fastify.get(
-			GET ,
+			GET_OWN ,
 			async ({memberRoles }) => {
-				const roles = await roleRepository.getCurrentRoles(memberRoles);
-				return roles;
+				return memberRoles;
 			});
 	}, { prefix: ROUTES_PREFIX });
 };

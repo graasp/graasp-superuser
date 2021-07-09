@@ -121,19 +121,25 @@ export class DeleteSuperUserPermission extends BaseGraaspError {
 
 export class DeleteSuperUserRole extends BaseGraaspError {
   constructor(data?: unknown) {
-    super({ code: 'GSUERR017', statusCode: 403, message: 'Role with superuser permission cannot be deleted' }, data);
+    super({ code: 'GSUERR017', statusCode: 403, message: 'Role with SuperUser permission cannot be deleted' }, data);
   }
 }
 
 export class CreateSuperUserRolePermission extends BaseGraaspError {
   constructor() {
-    super({ code: 'GSUERR018', statusCode: 403, message: 'Only SuperUsers can assign SuperUser privilege to a Role' });
+    super({ code: 'GSUERR018', statusCode: 403, message: 'Only SuperUsers can assign a permission to the SuperUser role' });
   }
 }
 
-export class DeleteSuperUserRolePermission extends BaseGraaspError {
+export class SUPermissionNotAssignable extends BaseGraaspError {
   constructor() {
-    super({ code: 'GSUERR019', statusCode: 403, message: 'Only SuperUsers can delete SuperUser privilege to a Role' });
+    super({ code: 'GSUERR019', statusCode: 403, message: 'SuperUser permission cannot be assigned to any Role' });
+  }
+}
+
+export class SUPermissionNotRemovable extends BaseGraaspError {
+  constructor() {
+    super({ code: 'GSUERR020', statusCode: 403, message: 'SuperUser permission cannot be removed from role' });
   }
 }
 

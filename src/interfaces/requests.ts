@@ -2,6 +2,7 @@ export interface IdParam { id: string }
 export interface IdsParams { id: string[] }
 export interface ParentIdParam { parentId?: string }
 export interface PermissionIdParam { permissionId: string}
+export interface RoleIdParam { roleId: string}
 export interface PermissionBody {
 	endpoint: string,
 	description: string,
