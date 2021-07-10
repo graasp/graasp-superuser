@@ -8,11 +8,11 @@ import {
 	POST_ROLE_PERMISSION,
 	POST,
 	DELETE_ROLE_PERMISSION,
-	GET_OWN, GET_BY_ID
+	GET_OWN, GET_BY_ID, PATCH
 } from './routes';
-import {IdParam, PermissionIdParam} from '../../interfaces/requests';
+import {IdParam, PermissionIdParam, RoleBody} from '../../interfaces/requests';
 import {Role} from '../../interfaces/role';
-import {createRole, createRolePermission, deleteRole, deleteRolePermission,getOne} from './fluent-schema';
+import {createRole, createRolePermission, deleteRole, deleteRolePermission, getOne, update} from './fluent-schema';
 import {PermissionRepository} from '../permissions/repository';
 
 const plugin: FastifyPluginAsync = async (fastify) => {
@@ -78,6 +78,13 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			}
 		);
 
+		fastify.patch<{ Params: IdParam, Body: RoleBody }>(
+			PATCH, { schema: update},
+			async ({superUser,params:{id},body: {description}}) => {
+				const role = await roleRepository.update(superUser,id,description);
+				return role;
+			}
+		);
 	}, { prefix: ROUTES_PREFIX });
 
 	fastify.register(async function (fastify) {

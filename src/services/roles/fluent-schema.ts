@@ -47,3 +47,14 @@ export const deleteRolePermission = {
 		'4xx': error
 	}
 };
+
+export const update = {
+	params: { $ref: 'http://graasp.org/#/definitions/idParam' },
+	body: S.object().additionalProperties(false)
+		.prop('description',S.string())
+		.required(['description']),
+	response: {
+		200:  role,
+		'4xx': error
+	}
+};

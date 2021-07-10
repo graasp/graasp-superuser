@@ -47,12 +47,6 @@ export class RoleRepository {
 		return result;
 	}
 
-	async deleteRole(id) {
-		if(id === SUPER_USER_ROLE_UUID) throw new SURoleDelete();
-		const result = await this.roleService.delete(id,this.handler);
-		return result;
-	}
-
 	async createRolePermission(permission: Permission,roleId){
 
 		if(BasePermission.checkSuperUserPermission(permission)) throw new SUPermissionNotAssignable();
@@ -61,11 +55,23 @@ export class RoleRepository {
 
 	}
 
+	async deleteRole(id) {
+		if(id === SUPER_USER_ROLE_UUID) throw new SURoleDelete();
+		const result = await this.roleService.delete(id,this.handler);
+		return result;
+	}
+
 	async deleteRolePermission(permission: Permission,roleId){
 
 		if(BasePermission.checkSuperUserPermission(permission)) throw new SUPermissionNotRemovable();
 
 		await this.roleService.deleteRolePermission(roleId,permission.id,this.handler);
 		return;
+	}
+
+	async update(superUser,id,description) {
+		if(id === SUPER_USER_ROLE_UUID && !superUser) throw new SURoleDelete();
+		const result = await this.roleService.update(id,description,this.handler);
+		return result;
 	}
 }

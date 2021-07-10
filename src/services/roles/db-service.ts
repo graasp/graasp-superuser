@@ -72,6 +72,17 @@ export class RoleService {
 			`).then(({rows}) => rows.slice(0));
 	}
 
+	async getRolesByMemberId (memberId: string, transactionHandler: TrxHandler): Promise<Role[]> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		return transactionHandler.query<Role>(sql`
+			SELECT ${RoleService.allColumnsForJoins} FROM role
+			JOIN admin_role ar on role.id = ar.role
+			JOIN member m on m.id = ar.admin
+			WHERE m.id = ${memberId}
+		`).then(({rows}) => rows.slice(0));
+	}
+
 	async create(role: Role, transactionHandler: TrxHandler): Promise<Role> {
 		const { description } = role;
 
@@ -86,6 +97,15 @@ export class RoleService {
 			.then(({ rows }) => rows[0]);
 	}
 
+	async createRolePermission(roleId: string, permissionId: string, transactionHandler: TrxHandler): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		await transactionHandler.query(sql`
+        INSERT INTO role_permission (role,permission)
+        VALUES (${roleId},${permissionId})
+      `);
+	}
+
 	async delete(id: string, transactionHandler: TrxHandler): Promise<Role> {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
@@ -94,15 +114,6 @@ export class RoleService {
         WHERE id = ${id}
         RETURNING ${RoleService.allColumns}
       `).then(({ rows }) => rows[0] || null);
-	}
-
-	async createRolePermission(roleId: string, permissionId: string, transactionHandler: TrxHandler): Promise<void> {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		await transactionHandler.query(sql`
-        INSERT INTO role_permission (role,permission)
-        VALUES (${roleId},${permissionId})
-      `);
 	}
 
 	async deleteRolePermission(roleId: string, permissionId: string, transactionHandler: TrxHandler): Promise<void> {
@@ -114,14 +125,15 @@ export class RoleService {
       `);
 	}
 
-	async getRolesByMemberId (memberId: string, transactionHandler: TrxHandler): Promise<Role[]> {
+	async update(roleId: string, description: string, transactionHandler: TrxHandler): Promise<Role> {
+		console.log(roleId,description);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		return transactionHandler.query<Role>(sql`
-			SELECT ${RoleService.allColumnsForJoins} FROM role
-			JOIN admin_role ar on role.id = ar.role
-			JOIN member m on m.id = ar.admin
-			WHERE m.id = ${memberId}
-		`).then(({rows}) => rows.slice(0));
+			UPDATE role
+			SET description= ${description}
+			WHERE id = ${roleId}
+			RETURNING  ${RoleService.allColumns}
+		`).then(({rows}) => rows[0]);
 	}
 }
