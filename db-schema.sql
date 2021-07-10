@@ -2,10 +2,10 @@ CREATE TABLE IF NOT EXISTS "permission"
 (
     "id" uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     "endpoint" VARCHAR(500) NOT NULL,
-    "request_method" VARCHAR(6) NOT NULL,
+    "method" VARCHAR(6) NOT NULL,
     "description" VARCHAR(5000) NOT NULL,
     CONSTRAINT "endpoint_method"
-        UNIQUE ("endpoint", "request_method")
+        UNIQUE ("endpoint", "method")
 );
 
 CREATE TABLE IF NOT EXISTS "role"
