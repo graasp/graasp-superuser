@@ -12,7 +12,7 @@ export const generalUUID =
 export const direction =
         S.string().enum(Object.values(DIRECTION)).default(DIRECTION.ASC);
 
-export const requestMethod =
+export const method =
     S.string().enum(Object.values(METHODS));
 
 
@@ -67,7 +67,7 @@ const shared = S.object()
   .definition('error', error)
     .definition('direction',direction)
     .definition('level',level)
-    .definition('requestMethod',requestMethod)
+    .definition('method',method)
 ;
 
 export default shared;

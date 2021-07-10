@@ -1,8 +1,8 @@
 import {FastifyPluginAsync} from 'fastify';
 import common from './schemas';
 import {PermissionRepository} from './repository';
-import {ROUTES_PREFIX, GET, POST, DELETE, GET_OWN, GET_BY_ID} from './routes';
-import {createPermission, deletePermission, getOne, getPermissions} from './fluent-schema';
+import {ROUTES_PREFIX, GET, POST, DELETE, GET_OWN, GET_BY_ID, PATCH} from './routes';
+import {createPermission, deletePermission, getOne, getPermissions, update} from './fluent-schema';
 import {ChildrenParam, IdParam, PermissionBody, RoleParam} from '../../interfaces/requests';
 
 const plugin: FastifyPluginAsync = async (fastify) => {
@@ -55,6 +55,14 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			}
 		);
 
+		fastify.patch<{Params: IdParam }>(
+			PATCH, { schema: update},
+			async ({params: {id},body},reply) => {
+				const permission = await repository.update(id,body);
+				return permission;
+			}
+		);
+
 	}, { prefix: ROUTES_PREFIX });
 
 	fastify.register(async function (fastify) {
@@ -67,6 +75,8 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 				return permissions;
 			});
 	}, { prefix: ROUTES_PREFIX });
+
+
 };
 
 export default plugin;

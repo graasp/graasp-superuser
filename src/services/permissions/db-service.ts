@@ -5,9 +5,7 @@ import {
 } from 'slonik';
 
 import {Permission} from '../../interfaces/permission';
-import {Item} from '../../interfaces/item';
 import {Role} from '../../interfaces/role';
-import {AdminRole} from '../../interfaces/admin-role';
 
 declare module 'fastify' {
 	interface FastifyInstance {
@@ -21,7 +19,7 @@ export class PermissionService {
 	// the 'safe' way to dynamically generate the columns names:
 	private static allColumns = sql.join(
 		[
-			'id', 'endpoint', ['request_method','requestMethod'],'description',
+			'id', 'endpoint', 'method','description',
 		].map(c =>
 			!Array.isArray(c) ?
 				sql.identifier([c]) :
@@ -35,7 +33,7 @@ export class PermissionService {
 			[['permission', 'id'], ['id']],
 			[['permission', 'description'], ['description']],
 			[['permission', 'endpoint'], ['endpoint']],
-			[['permission', 'request_method'], ['requestMethod']],
+			[['permission', 'method'], ['method']],
 		].map(c => sql.join(c.map(cwa => sql.identifier(cwa)), sql` AS `)),
 		sql`, `
 	);
@@ -115,14 +113,14 @@ export class PermissionService {
 	}
 
 	async create(permission: Permission, transactionHandler: TrxHandler): Promise<Permission> {
-		const { description, endpoint, requestMethod } = permission;
+		const { description, endpoint, method } = permission;
 
 		return transactionHandler
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			.query<Permission>(sql`
-        INSERT INTO permission (endpoint, request_method, description)
-        VALUES (${endpoint}, ${requestMethod}, ${description})
+        INSERT INTO permission (endpoint, method, description)
+        VALUES (${endpoint}, ${method}, ${description})
         RETURNING ${PermissionService.allColumns}
       `)
 			.then(({ rows }) => rows[0]);
@@ -136,5 +134,33 @@ export class PermissionService {
         WHERE id = ${id}
         RETURNING ${PermissionService.allColumns}
       `).then(({ rows }) => rows[0] || null);
+	}
+
+	async update(id: string, data: Partial<Permission>, transactionHandler: TrxHandler): Promise<Permission> {
+		const partialPermission = data;
+
+		const setValues = sql.join(
+			Object.keys(partialPermission)
+				.map((key: keyof Permission) =>
+					sql.join(
+						[
+							sql.identifier([key]),
+							sql`${partialPermission[key]}`
+						],
+						sql` = `
+					)
+				),
+			sql`, `
+		);
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Permission>(sql`
+        UPDATE permission
+        SET ${setValues}
+        WHERE id = ${id}
+        RETURNING ${PermissionService.allColumns}
+      `).then(({ rows }) => rows[0]);
 	}
 }

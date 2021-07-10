@@ -7,3 +7,5 @@ export const GET_BY_ID = '/:id';
 export const POST = '/';
 
 export const DELETE = '/:id';
+
+export const PATCH = '/:id';

@@ -1,4 +1,4 @@
-import {error, idParam, requestMethod, uuid} from '../../schemas/fluent-schema';
+import {error, idParam, method, uuid} from '../../schemas/fluent-schema';
 import S from 'fluent-json-schema';
 
 const role = S.object()

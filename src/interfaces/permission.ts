@@ -1,6 +1,6 @@
 export interface Permission {
 	id: string;
 	endpoint: string;
-	requestMethod: string;
+	method: string;
 	description: string;
 }

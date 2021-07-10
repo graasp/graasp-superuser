@@ -2,8 +2,8 @@ import {DatabaseTransactionHandler} from '../../plugins/db';
 import {PermissionService} from './db-service';
 import {DeleteSuperUserPermission, RequestNotAllowed} from '../../util/graasp-error';
 import {BasePermission} from './base-permission';
-import {AdminRole} from '../../interfaces/admin-role';
 import {Role} from '../../interfaces/role';
+import {Permission} from '../../interfaces/permission';
 
 export class PermissionRepository {
 	protected permissionService: PermissionService;
@@ -18,12 +18,12 @@ export class PermissionRepository {
 		const permissions = await this.permissionService.getPermissions(roles, this.handler);
 
 		const allowed =
-			permissions.filter(({endpoint, requestMethod}) => {
+			permissions.filter(({endpoint, method}) => {
 
 				const endpointRegex = new RegExp(endpoint);
-				const requestMethodRegex = new RegExp(requestMethod);
+				const methodRegex = new RegExp(method);
 
-				return (endpointRegex.test(path) && requestMethodRegex.test(method));
+				return (endpointRegex.test(path) && methodRegex.test(method));
 			});
 
 		return allowed;
@@ -69,6 +69,11 @@ export class PermissionRepository {
 		if(BasePermission.checkSuperUserPermission(permission)) throw new DeleteSuperUserPermission(id);
 
 		const result = await this.permissionService.delete(id,this.handler);
+		return result;
+	}
+
+	async update(id,partialPermission: Partial<Permission>) {
+		const result = await this.permissionService.update(id,partialPermission,this.handler);
 		return result;
 	}
 }

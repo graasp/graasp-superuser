@@ -6,7 +6,7 @@ export default {
 			properties: {
 				id: { type: 'string'},
 				endpoint: { type: 'string' },
-				requestMethod: { type: 'string' },
+				method: { type: 'string' },
 				description: { type: 'string' },
 			},
 			additionalProperties: false
