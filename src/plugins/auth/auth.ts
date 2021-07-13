@@ -18,7 +18,7 @@ import {
     REFRESH_TOKEN_JWT_SECRET,
     REFRESH_TOKEN_EXPIRATION_IN_MINUTES,
     LOGIN_TOKEN_EXPIRATION_IN_MINUTES,
-    JWT_SECRET, EMAIL_LINKS_HOST, PROTOCOL, CLIENT_HOST, SUPER_USER_ROLE_UUID
+    JWT_SECRET, EMAIL_LINKS_HOST, PROTOCOL, CLIENT_HOST, SUPER_USER_ROLE_UUID, SECURE_SESSION_SECRET_KEY
 } from '../../util/config';
 
 // other services
@@ -49,7 +49,7 @@ const plugin: FastifyPluginAsync<AuthPluginOptions> = async (fastify, options) =
   fastify.register(fastifySecureSession, {
     // TODO: maybe change to the 'secret' option, which is just a string (makes the boot slower).
     // Production needs its own key: https://github.com/fastify/fastify-secure-session#using-a-pregenerated-key
-    key: fs.readFileSync(path.join(process.cwd(), 'secure-session-secret-key')),
+      key: Buffer.from(SECURE_SESSION_SECRET_KEY, 'hex'),
     cookie: { domain, path: '/' }
   });
 

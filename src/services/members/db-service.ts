@@ -132,7 +132,7 @@ export class MemberService {
       			SELECT ${MemberService.allColumnsForJoins} from member
 			JOIN item_membership im on member.id = im.member_id
 			JOIN item on item.path=im.item_path
-			-- JOIN member m on m.id = im.member_id
+			JOIN member m on m.id = im.member_id
 			WHERE im.item_path@>${path}
       		`)
 			.then(({ rows }) => rows.slice(0));

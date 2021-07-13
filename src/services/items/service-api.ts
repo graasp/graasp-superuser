@@ -49,7 +49,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 		fastify.get<{ Params: IdParam,Querystring: ChildrenParam}>(
 			GET_PARENTS,
 			async ({ params:{id}}) => {
-				const parents = await itemsRepository.getChildren(id);
+				const parents = await itemsRepository.getParents(id);
 				return parents;
 			});
 
