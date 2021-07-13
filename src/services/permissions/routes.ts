@@ -1,6 +1,6 @@
 export const ROUTES_PREFIX = '/permissions';
 
-export const GET = '/';
+export const GET_ALL = '/all';
 export const GET_OWN = '/own';
 export const GET_BY_ID = '/:id';
 

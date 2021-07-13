@@ -3,6 +3,7 @@ export const ROUTES_PREFIX = '/roles';
 export const GET_ALL = '/all';
 export const GET_OWN = '/own';
 export const GET_BY_ID = '/:id';
+export const GET_PERMISSIONS = '/:id/permissions';
 
 export const POST = '/';
 export const POST_ROLE_PERMISSION = '/:id/permission';

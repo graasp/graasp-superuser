@@ -1,7 +1,7 @@
 import {FastifyPluginAsync} from 'fastify';
 import common from './schemas';
 import {PermissionRepository} from './repository';
-import {ROUTES_PREFIX, GET, POST, DELETE, GET_OWN, GET_BY_ID, PATCH} from './routes';
+import {ROUTES_PREFIX, POST, DELETE, GET_OWN, GET_BY_ID, PATCH, GET_ALL} from './routes';
 import {createPermission, deletePermission, getOne, getPermissions, update} from './fluent-schema';
 import {ChildrenParam, IdParam, PermissionBody, RoleParam} from '../../interfaces/requests';
 
@@ -24,18 +24,10 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			}
 		);
 
-		fastify.get<{ Querystring: RoleParam}>(
-			GET, {schema: getPermissions}, async ({query: {roleId}} ) => {
-
-				if(roleId){
-					const permissions = await repository.getPermissionsByRole(roleId,true);
-					return permissions;
-				}
-				else{
-					const permissions = await repository.getAllPermissions();
-
-					return permissions;
-				}
+		fastify.get(
+			GET_ALL, async () => {
+				const permissions = await repository.getAllPermissions();
+				return permissions;
 
 			});
 

@@ -8,7 +8,7 @@ import {
 	POST_ROLE_PERMISSION,
 	POST,
 	DELETE_ROLE_PERMISSION,
-	GET_OWN, GET_BY_ID, PATCH
+	GET_OWN, GET_BY_ID, PATCH, GET_PERMISSIONS
 } from './routes';
 import {IdParam, PermissionIdParam, RoleBody} from '../../interfaces/requests';
 import {Role} from '../../interfaces/role';
@@ -56,6 +56,14 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			async ({  params: {id}, log }) => {
 				const role = await roleRepository.deleteRole(id);
 				return role;
+			}
+		);
+
+		fastify.get<{ Params: IdParam}> (
+			GET_PERMISSIONS,
+			async ({ params: {id}}) => {
+				const permissions = await permissionRepository.getPermissionsByRole(id,true);
+				return permissions;
 			}
 		);
 
