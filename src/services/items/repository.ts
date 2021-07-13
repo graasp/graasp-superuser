@@ -31,6 +31,15 @@ export class ItemRepository  {
 		return children;
 	}
 
+	async getParents(itemId ) {
+		const item = await this.get(itemId);
+		if (!item) throw new ItemNotFound(itemId);
+
+		const parents = await this.itemService.getParents(item,this.handler);
+
+		return parents;
+	}
+
 	async getItemsByMember(memberId) {
 		const items = await this.itemService.getItemsByMemberId(memberId,this.handler);
 		return items;

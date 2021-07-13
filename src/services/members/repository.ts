@@ -28,6 +28,11 @@ export class MemberRepository<E extends UnknownExtra>  {
 		return member;
 	}
 
+	async getMembersForItem(path) {
+		const member = await this.memberService.getMemberByPath(path,this.handler);
+		return member;
+	}
+
 
 	async getAllMembers() {
 		const allMembers = await this.memberService.getAllMembers(this.handler);

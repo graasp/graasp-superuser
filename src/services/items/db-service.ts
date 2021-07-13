@@ -85,10 +85,11 @@ export class ItemService {
 		return transactionHandler.query<Item<E>>(sql`
        	SELECT ${ItemService.allColumnsForJoinsWithMemberName} from item
 		JOIN item_membership im on item.path = im.item_path
-		JOIN member on member.id = im.member_id
+		JOIN member on member.id = im.creator
 		WHERE member_id = ${id}
 		`).then(({rows}) => rows.slice(0));
 	}
+
 	async getDescendants(item: Item, transactionHandler: TrxHandler,
 		direction: ('ASC' | 'DESC') = 'ASC', levels: number | 'ALL' = 'ALL', properties?: (keyof Item)[]): Promise<Item[]> {
 		let selectColumns;
@@ -119,4 +120,33 @@ export class ItemService {
 			.then(({ rows }) => rows.slice(0));
 	}
 
+	async getDescendants(item: Item, transactionHandler: TrxHandler,
+		direction: ('ASC' | 'DESC') = 'ASC', levels: number | 'ALL' = 'ALL', properties?: (keyof Item)[]): Promise<Item[]> {
+		let selectColumns;
+
+		if (properties && properties.length) {
+			selectColumns = sql.join(
+				properties.map(p => sql.identifier([p])),
+				sql`, `
+			);
+		}
+
+		const levelLimit = levels !== 'ALL' && levels > 0 ?
+			sql`AND nlevel(path) <= nlevel(${item.path}) + ${levels}` : sql``;
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Item>(sql`
+        SELECT ${selectColumns || ItemService.allColumnsForJoinsWithMemberName} FROM item
+        JOIN member on member.id = item.creator
+        WHERE path <@ ${item.path}
+          AND item.id != ${item.id}
+          ${levelLimit}
+        ORDER BY nlevel(path) ${direction === 'DESC' ? sql`DESC` : sql`ASC`}
+      `) 	// `AND id != ${item.id}` because <@ includes the item's path
+			// TODO: is there a better way to avoid the error of assigning
+			// this result to a mutable property? (.slice(0))
+			.then(({ rows }) => rows.slice(0));
+	}
 }

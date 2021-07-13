@@ -17,6 +17,9 @@ PORT=3000
 # EMAIL_LINKS_HOST=
 # CLIENT_HOST=
 
+# SuperUser Role Id
+SUPER_USER_ROLE_UUID = 
+
 # JWT secret
 JWT_SECRET=
 

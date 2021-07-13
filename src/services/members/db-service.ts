@@ -123,6 +123,21 @@ export class MemberService {
 			.then(({ rows }) => rows[0]);
 	}
 
+	async getMemberByPath(path: string, transactionHandler: TrxHandler): Promise<Member[]> {
+
+		return transactionHandler
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			.query<Member>(sql`
+      			SELECT ${MemberService.allColumnsForJoins} from member
+			JOIN item_membership im on member.id = im.member_id
+			JOIN item on item.path=im.item_path
+			-- JOIN member m on m.id = im.member_id
+			WHERE im.item_path@>${path}
+      		`)
+			.then(({ rows }) => rows.slice(0));
+	}
+
 	async createMemberRole(memberId: string, roleId: string, transactionHandler: TrxHandler): Promise<void> {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
