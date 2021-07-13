@@ -95,7 +95,7 @@ export class ItemService {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			.query<Item>(sql`
-        SELECT ${ItemService.allColumnsForJoins} FROM item
+        SELECT ${ItemService.allColumnsForJoinsWithMemberName} FROM item
         JOIN member on member.id = item.creator
         WHERE path@> ${item.path}
           AND item.id != ${item.id}
