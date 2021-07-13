@@ -102,21 +102,21 @@ export class MemberService {
 	 * @param transactionHandler Database handler
 	 * @param properties List of Member properties to fetch - defaults to 'all'
 	 */
-	async get<E extends UnknownExtra>(id: string, transactionHandler: TrxHandler, properties?: (keyof Member)[]): Promise<Member<E>> {
-		let selectColumns;
-
-		if (properties && properties.length) {
-			selectColumns = sql.join(
-				properties.map(p => sql.identifier([p])),
-				sql`, `
-			);
-		}
+	async get(id: string, transactionHandler: TrxHandler): Promise<Member> {
+		// let selectColumns;
+		//
+		// if (properties && properties.length) {
+		// 	selectColumns = sql.join(
+		// 		properties.map(p => sql.identifier([p])),
+		// 		sql`, `
+		// 	);
+		// }
 
 		return transactionHandler
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			.query<Member<E>>(sql`
-        SELECT ${selectColumns || MemberService.allColumns}
+			.query<Member>(sql`
+        SELECT ${MemberService.allColumns}
         FROM member
         WHERE id = ${id}
       `)

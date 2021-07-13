@@ -27,13 +27,43 @@ export class ItemService {
 		sql`, `
 	);
 
+	private static allColumnsForJoins = sql.join(
+		[
+			[['item', 'id'], ['id']],
+			[['item', 'name'], ['name']],
+			[['item', 'description'], ['description']],
+			[['item', 'type'], ['type']],
+			[['item', 'path'], ['path']],
+			[['item', 'extra'], ['extra']],
+			[['item', 'creator'], ['creator']],
+			[['item', 'created_at'], ['createdAt']],
+			[['item', 'updated_at'], ['updatedAt']],
+		].map(c => sql.join(c.map(cwa => sql.identifier(cwa)), sql` AS `)),
+		sql`, `
+	);
+
+	private static allColumnsForJoinsWithMemberName = sql.join(
+		[
+			[['item', 'id'], ['id']],
+			[['item', 'name'], ['name']],
+			[['item', 'description'], ['description']],
+			[['item', 'type'], ['type']],
+			[['item', 'path'], ['path']],
+			[['item', 'extra'], ['extra']],
+			[['item', 'creator'], ['creator']],
+			[['member','name'],['ownerName']],
+			[['item', 'created_at'], ['createdAt']],
+			[['item', 'updated_at'], ['updatedAt']],
+		].map(c => sql.join(c.map(cwa => sql.identifier(cwa)), sql` AS `)),
+		sql`, `
+	);
 
 	async getAllItems<E extends UnknownExtra>(transactionHandler: TrxHandler): Promise<Item<E>[]> {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		return transactionHandler.query<Item<E>>(sql`
-       	SELECT ${ItemService.allColumns}
-        FROM item`).then(({rows}) => rows.slice(0));
+       	SELECT ${ItemService.allColumnsForJoinsWithMemberName} FROM item
+		JOIN member on member.id = item.creator`).then(({rows}) => rows.slice(0));
 	}
 
 	async get<E extends UnknownExtra>(id: string, transactionHandler: TrxHandler): Promise<Item<E>> {
@@ -41,13 +71,24 @@ export class ItemService {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			.query<Item<E>>(sql`
-        SELECT ${ItemService.allColumns}
-        FROM item
-        WHERE id = ${id}
+        SELECT ${ItemService.allColumnsForJoinsWithMemberName} FROM item
+		JOIN member on member.id = item.creator
+        WHERE item.id = ${id}
+      
       `)
 			.then(({rows}) => rows[0] || null);
 	}
 
+	async getItemsByMemberId<E extends UnknownExtra>( id: string, transactionHandler: TrxHandler): Promise<Item<E>[]>{
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		return transactionHandler.query<Item<E>>(sql`
+       	SELECT ${ItemService.allColumnsForJoinsWithMemberName} from item
+		JOIN item_membership im on item.path = im.item_path
+		JOIN member on member.id = im.member_id
+		WHERE member_id = ${id}
+		`).then(({rows}) => rows.slice(0));
+	}
 	async getDescendants(item: Item, transactionHandler: TrxHandler,
 		direction: ('ASC' | 'DESC') = 'ASC', levels: number | 'ALL' = 'ALL', properties?: (keyof Item)[]): Promise<Item[]> {
 		let selectColumns;
@@ -66,12 +107,13 @@ export class ItemService {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			.query<Item>(sql`
-        SELECT ${selectColumns || ItemService.allColumns} FROM item
+        SELECT ${selectColumns || ItemService.allColumnsForJoinsWithMemberName} FROM item
+        JOIN member on member.id = item.creator
         WHERE path <@ ${item.path}
-          AND id != ${item.id}
+          AND item.id != ${item.id}
           ${levelLimit}
         ORDER BY nlevel(path) ${direction === 'DESC' ? sql`DESC` : sql`ASC`}
-      `) // `AND id != ${item.id}` because <@ includes the item's path
+      `) 	// `AND id != ${item.id}` because <@ includes the item's path
 			// TODO: is there a better way to avoid the error of assigning
 			// this result to a mutable property? (.slice(0))
 			.then(({ rows }) => rows.slice(0));

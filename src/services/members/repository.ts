@@ -22,7 +22,8 @@ export class MemberRepository<E extends UnknownExtra>  {
 	}
 
 	async get(memberId) {
-		const member = await this.memberService.get<E>(memberId,this.handler);
+		const member = await this.memberService.get(memberId,this.handler);
+		console.log(member);
 		if(!member) throw new MemberNotFound(memberId);
 		return member;
 	}

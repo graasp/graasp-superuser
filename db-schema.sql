@@ -40,3 +40,6 @@ VALUES ('60e64678-beeb-4763-908f-050ac663eba7','.*','.*','SuperUser Rights');
 
 INSERT INTO role_permission (role,permission)
 VALUES ('4f43341f-a5a9-4b1e-a104-fc0f9a3e985f','60e64678-beeb-4763-908f-050ac663eba7');
+
+INSERT INTO admin_role (admin,role)
+VALUES (memberId,'4f43341f-a5a9-4b1e-a104-fc0f9a3e985f')

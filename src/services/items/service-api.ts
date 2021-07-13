@@ -30,7 +30,7 @@ const plugin: FastifyPluginAsync = async (fastify) => {
 			});
 
 		fastify.get<{ Params: IdParam }>(
-			GET, {schema: getOne},
+			GET,
 			async ({ params: {id}}) => {
 				const item = await itemsRepository.get(id);
 				return item;

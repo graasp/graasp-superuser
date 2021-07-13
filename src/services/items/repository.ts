@@ -30,4 +30,9 @@ export class ItemRepository  {
 
 		return children;
 	}
+
+	async getItemsByMember(memberId) {
+		const items = await this.itemService.getItemsByMemberId(memberId,this.handler);
+		return items;
+	}
 }

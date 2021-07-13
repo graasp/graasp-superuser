@@ -129,7 +129,6 @@ const getChildren = {
       .prop('direction',direction)
   ,
   response: {
-    200: S.array().items(item),
     '4xx': error
   }
 };
