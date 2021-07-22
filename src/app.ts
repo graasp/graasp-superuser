@@ -1,8 +1,14 @@
 import fastify, { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
 import {
-	PG_CONNECTION_URI, DATABASE_LOGS, DISABLE_LOGS,
-	ENVIRONMENT, MAILER_CONFIG_SMTP_HOST, MAILER_CONFIG_USERNAME, MAILER_CONFIG_PASSWORD, MAILER_CONFIG_FROM_EMAIL
+  PG_CONNECTION_URI,
+  DATABASE_LOGS,
+  DISABLE_LOGS,
+  ENVIRONMENT,
+  MAILER_CONFIG_SMTP_HOST,
+  MAILER_CONFIG_USERNAME,
+  MAILER_CONFIG_PASSWORD,
+  MAILER_CONFIG_FROM_EMAIL,
 } from './util/config';
 import shared from './schemas/fluent-schema';
 
@@ -10,13 +16,13 @@ import databasePlugin from './plugins/db';
 import authPlugin from './plugins/auth/auth';
 import mailerPlugin from 'graasp-mailer';
 
-import {MemberService} from './services/members/db-service';
+import { MemberService } from './services/members/db-service';
 import MemberServiceAPI from './services/members/service-api';
-import {ItemService} from './services/items/db-service';
+import { ItemService } from './services/items/db-service';
 import ItemServiceAPI from './services/items/service-api';
 import {PermissionService} from './services/permissions/db-service';
 import PermissionServiceAPI from './services/permissions/service-api';
-import {RoleService} from './services/roles/db-service';
+import { RoleService } from './services/roles/db-service';
 import RoleServiceAPI from './services/roles/service-api';
 
 const decorateFastifyInstance: FastifyPluginAsync = async (fastify) => {
